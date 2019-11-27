@@ -9,4 +9,5 @@ public class Domain {
     String domDes;
     String domToken;
     Integer status;
+    String domName;
 }

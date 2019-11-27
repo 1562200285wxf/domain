@@ -9,10 +9,11 @@
         <result property="resTypeId" column="restypeid"/>
         <result property="resPid" column="respid"/>
         <result property="status" column="status"/>
+        <result property="insName" column="insname"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        id, domid, ownerid, resid, restypeid, respid, status
+        id, domid, ownerid, resid, restypeid, respid, status, insname
     </sql>
 
     <!--根据资源属主标识查询资源实例-->
@@ -31,8 +32,8 @@
     </select>
 
     <insert id="insert" parameterType="cn.itsmith.sysutils.resacl.entities.DomResInstance" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO t_dom_res_instance (domid, ownerid, restypeid, resid, ResPId, status)
-            VALUES (#{domId}, #{ownerId}, #{resTypeId}, #{resId}, #{resPid}, #{status} )
+        INSERT INTO t_dom_res_instance (domid, ownerid, restypeid, resid, ResPId, status, insname)
+            VALUES (#{domId}, #{ownerId}, #{resTypeId}, #{resId}, #{resPid}, #{status}, #{insName} )
     </insert>
 
     <delete id="delete" >

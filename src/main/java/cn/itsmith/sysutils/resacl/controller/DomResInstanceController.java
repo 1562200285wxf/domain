@@ -91,6 +91,7 @@ public class DomResInstanceController {
         domResInstance.setResTypeId(domResInstanceA.getResTypeId());
         domResInstance.setResId(domResInstanceA.getResId());
         domResInstance.setResPid(domResInstanceA.getResPid());
+        domResInstance.setInsName(domResInstanceA.getInsName());
         return domResInstanceService.addDomResInstance(domResInstance);
     }
 

@@ -59,6 +59,7 @@ public class DomResOwnerController {
         DomResOwner domResOwner = new DomResOwner();
         domResOwner.setDomId(domResOwnerA.getDomId());
         domResOwner.setOwnerDes(domResOwnerA.getOwnerDes());
+        domResOwner.setOwnerName(domResOwnerA.getOwnerName());
         domResOwner.setPId(domResOwnerA.getPId());
         return domResOwnerService.addDomResOwner(domResOwner);
     }

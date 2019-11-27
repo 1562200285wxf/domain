@@ -14,4 +14,5 @@ public class DomUserOperation {
     Integer id;
     Integer types;
     Integer status;
+    String opName;
 }

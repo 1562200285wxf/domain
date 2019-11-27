@@ -9,6 +9,7 @@ import lombok.Data;
 public class DomResOwnerA {
     Integer domId;
     String ownerDes;
+    String ownerName;
     //父节点=0又是根节点。
     Integer pId;
 }

@@ -13,4 +13,5 @@ public class DomResInstance {
     //资源父实例id
     Integer resPid;
     Integer status;
+    String insName;
 }

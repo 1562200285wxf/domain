@@ -8,10 +8,11 @@
         <result property="ownerDes" column="ownerdes"/>
         <result property="pId" column="pid"/>
         <result property="status" column="status"/>
+        <result property="ownerName" column="ownername"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        domid,ownerid, ownerdes,pid, status
+        domid,ownerid, ownerdes,pid, status, ownername
     </sql>
 
     <!--查询全部的资源属主信息-->
@@ -32,8 +33,8 @@
 
     <!--新增域内资源属主-->
     <insert id="insert" parameterType="cn.itsmith.sysutils.resacl.entities.DomResOwner" useGeneratedKeys="true" keyProperty="ownerId">
-        INSERT INTO t_dom_res_owner (domid, ownerdes, pid, status)
-            VALUES (#{domId}, #{ownerDes}, #{pId}, #{status})
+        INSERT INTO t_dom_res_owner (domid, ownerdes, pid, status, ownername)
+            VALUES (#{domId}, #{ownerDes}, #{pId}, #{status}, #{ownerName})
     </insert>
 
     <!--修改资源属主描述-->
