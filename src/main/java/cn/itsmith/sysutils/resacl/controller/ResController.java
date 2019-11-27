@@ -42,7 +42,7 @@ public class ResController {
             "2.目标插入到的属主一定要存在【对应异常代码：1002】  \n" +
             "3.不能重复添加一摸一样的一条属主拥有资源记录【对应异常代码：2001】  \n" +
             "4.资源种类基本表中一定要有目标资源才能向逻辑表中添加【对应异常代码：2002】  \n")
-    @RequestMapping(value="/addownerres",method = RequestMethod.POST)
+    @RequestMapping(value="/ownerres",method = RequestMethod.POST)
     public ResultUtils addOwnerRes(@RequestBody DomOwnerResA domOwnerResA, @RequestHeader(value = "token", required = true) String validate){
         DomOwnerRes domOwnerRes = new DomOwnerRes();
         domOwnerRes.setDomId(domOwnerResA.getDomId());
