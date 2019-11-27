@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.itsmith.sysutils.resacl.dao.DomainMapper">
+    <resultMap id="Domain" type="cn.itsmith.sysutils.resacl.entities.Domain">
+        <result property="domId" column="domid"/>
+        <result property="domDes" column="domdes"/>
+        <result property="domToken" column="domtoken"/>
+        <result property="status" column="status"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        domid, domdes, domtoken, status
+    </sql>
+
+    <!--根据id查询域信息-->
+    <select id="select"  resultMap="Domain">
+        select
+        <include refid="Base_Column_List"/>
+        from t_domain
+        WHERE domid=#{domId, jdbcType=INTEGER} and domtoken=#{domToken, jdbcType=VARCHAR}
+    </select>
+<!--///liu-->
+
+    <select id="varify" resultType="Integer">
+    SELECT COUNT(*) FROM t_domain
+    WHERE t_domain.domid=#{domId} AND t_domain.domtoken=#{domToken}
+  </select>
+
+<!--    wang-->
+    <select id="selectByPrimaryKey" resultMap="Domain" parameterType="java.lang.Integer" >
+        select
+        <include refid="Base_Column_List" />
+        from t_domain
+        where domid = #{domId,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from t_domain
+    where domid = #{domId,jdbcType=INTEGER}
+  </delete>
+    <insert id="insert" parameterType="cn.itsmith.sysutils.resacl.entities.Domain" >
+    insert into t_domain (domid, domdes, domtoken
+      )
+    values (#{domId,jdbcType=INTEGER}, #{domDes,jdbcType=VARCHAR}, #{domToken,jdbcType=CHAR}
+      )
+  </insert>
+    <insert id="insertSelective" parameterType="cn.itsmith.sysutils.resacl.entities.Domain" >
+        insert into t_domain
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="domId != null" >
+                domid,
+            </if>
+            <if test="domDes != null" >
+                domdes,
+            </if>
+            <if test="domToken != null" >
+                domtoken,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="domId != null" >
+                #{domId,jdbcType=INTEGER},
+            </if>
+            <if test="domDes != null" >
+                #{domDes,jdbcType=VARCHAR},
+            </if>
+            <if test="domToken != null" >
+                #{domToken,jdbcType=CHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="cn.itsmith.sysutils.resacl.entities.Domain" >
+        update t_domain
+        <set >
+            <if test="domDes != null" >
+                domdes = #{domDes,jdbcType=VARCHAR},
+            </if>
+            <if test="domToken != null" >
+                domtoken = #{domToken,jdbcType=CHAR},
+            </if>
+        </set>
+        where domid = #{domId,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="cn.itsmith.sysutils.resacl.entities.Domain" >
+    update t_domain
+    set domdes = #{domDes,jdbcType=VARCHAR},
+      domtoken = #{domToken,jdbcType=CHAR}
+    where domid = #{domId,jdbcType=INTEGER}
+  </update>
+</mapper>

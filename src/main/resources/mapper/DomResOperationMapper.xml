@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.itsmith.sysutils.resacl.dao.DomResOperationMapper">
+    <resultMap id="DomResOperation" type="cn.itsmith.sysutils.resacl.entities.DomResOperation">
+        <result property="id" column="id"/>
+        <result property="domId" column="domid"/>
+        <result property="resTypeId" column="restypeid"/>
+        <result property="opId" column="opid"/>
+        <result property="opDes" column="opdes"/>
+        <result property="isExtend" column="isextend"/>
+        <result property="isCommon" column="iscommon"/>
+        <result property="status" column="status"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, domid, restypeid, opid, opdes, isExtend, isCommon, status
+    </sql>
+
+    <insert id="insert" parameterType="cn.itsmith.sysutils.resacl.entities.DomResOperation" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_dom_res_operation (domid, restypeid, opid, isExtend, isCommon, status)
+            VALUES (#{domId}, #{resTypeId}, #{opId}, #{isExtend}, #{isCommon}, #{status})
+    </insert>
+
+    <delete id="delete" parameterType="cn.itsmith.sysutils.resacl.entities.DomResOperation">
+        delete
+        from t_dom_res_operation
+        where domid=#{domId} and restypeid=#{resTypeId} and opid=#{opId}
+    </delete>
+
+    <update id="updateStatus" parameterType="cn.itsmith.sysutils.resacl.entities.DomResOperation">
+        update t_dom_res_operation
+        <set>
+            <if test="status != null">
+                status = #{status, jdbcType=INTEGER}
+            </if>
+        </set>
+        where domid=#{domId} and restypeid=#{resTypeId} and opid=#{opId}
+    </update>
+
+    <!--修改资源可用权限描述-->
+    <update id="updateOpDes" parameterType="cn.itsmith.sysutils.resacl.entities.DomResOperation">
+        update t_dom_res_operation
+        <set>
+            <if test="opDes != null">
+                opdes = #{opDes}
+            </if>
+        </set>
+        where domid=#{domId} and restypeid=#{resTypeId} and opid=#{opId}
+    </update>
+<!--    修改是否可继承-->
+    <update id="updateIsExtend" parameterType="cn.itsmith.sysutils.resacl.entities.DomResOperation">
+        update t_dom_res_operation
+        <set>
+            <if test="isExtend != null">
+                isextend = #{isExtend}
+            </if>
+        </set>
+        where domid=#{domId} and restypeid=#{resTypeId} and opid=#{opId}
+    </update>
+<!--修改是否是通用-->
+    <update id="updateIsCommon" parameterType="cn.itsmith.sysutils.resacl.entities.DomResOperation">
+        update t_dom_res_operation
+        <set>
+            <if test="isCommon != null">
+                iscommon = #{isCommon}
+            </if>
+        </set>
+        where domid=#{domId} and restypeid=#{resTypeId} and opid=#{opId}
+    </update>
+
+    <!--根据id查询-->
+    <select id="selectById"  resultMap="DomResOperation">
+        select
+        <include refid="Base_Column_List"/>
+        from t_dom_res_operation
+        WHERE domid=#{domId, jdbcType=INTEGER} and restypeid=#{resTypeId, jdbcType=VARCHAR}
+    </select>
+
+    <!--根据对象查询-->
+    <select id="select"  resultMap="DomResOperation" parameterType="cn.itsmith.sysutils.resacl.entities.DomResOperation">
+        select
+        <include refid="Base_Column_List"/>
+        from t_dom_res_operation
+        WHERE domid=#{domId} and restypeid=#{resTypeId} and opid=#{opId}
+    </select>
+
+</mapper>

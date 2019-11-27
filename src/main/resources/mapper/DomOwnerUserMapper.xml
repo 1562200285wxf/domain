@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.itsmith.sysutils.resacl.dao.DomOwnerUserMapper">
+    <resultMap id="DomOwnerUser" type="cn.itsmith.sysutils.resacl.entities.DomOwnerUser">
+        <result property="domId" column="domid"/>
+        <result property="ownerId" column="ownerid"/>
+        <result property="userId" column="userid"/>
+        <result property="isadmin" column="isadmin"/>
+        <result property="status" column="status"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        domid,ownerid, userid,isadmin, status
+    </sql>
+
+    <!--查询指定的Token信息-->
+    <select id="selectById"  resultMap="DomOwnerUser">
+        select
+        <include refid="Base_Column_List"/>
+        from t_dom_owner_user
+        WHERE domid=#{domId} and ownerid=#{ownerId} and userid=#{userId}
+    </select>
+
+<!--   根据属主标识查找属主成员-->
+    <select id="selectByDomId"  resultMap="DomOwnerUser" parameterType="int">
+        select
+        <include refid="Base_Column_List"/>
+        from t_dom_owner_user
+        WHERE ownerid=#{ownerId}
+    </select>
+
+
+<!--    liu-->
+    <insert id="addDomUser" useGeneratedKeys="true" keyProperty="id">
+        insert into t_dom_owner_user(ownerid, userid, domid,status) values (#{ownerId}, #{userId}, #{domId},1);
+    </insert>
+    <update id="updataStatus">
+            update t_dom_owner_user SET status= 1 WHERE  t_dom_owner_user.domid=#{domId}
+            AND t_dom_owner_user.ownerid = #{ownerId}
+            AND t_dom_owner_user.userid = #{userId};
+    </update>
+    <select id="queryAlluserIdsByDomId" resultType="java.lang.Integer">
+        SELECT userid FROM t_dom_owner_user WHERE domid=#{domId} AND ownerid=#{ownerId}
+    </select>
+    <select id="queryAlluserId2" resultType="java.lang.Integer">
+        SELECT userid FROM t_user
+    </select>
+
+
+
+    <!--<delete id="deleteUser">-->
+<!--&#45;&#45;         DELETE FROM t_dom_owner_user WHERE  t_dom_owner_user.domid=#{domId}-->
+<!--&#45;&#45;         AND t_dom_owner_user.userid = #{userId}-->
+<!--&#45;&#45;         AND t_dom_owner_user.ownerid = #{ownerId};-->
+    <!--</delete>-->
+<update id="deleteUser">
+    update t_dom_owner_user SET status= 0 WHERE  t_dom_owner_user.domid=#{domId}
+    AND t_dom_owner_user.ownerid = #{ownerId}
+    AND t_dom_owner_user.userid = #{userId};
+</update>
+    <update id="setAdmin">
+        update t_dom_owner_user SET isadmin= 1
+        where t_dom_owner_user.domid=#{domId}
+        AND t_dom_owner_user.ownerid=#{ownerId}
+        AND t_dom_owner_user.userid = #{userId} ;
+    </update>
+    <update id="cancelAdmin">
+        update t_dom_owner_user SET isadmin= 0
+        where t_dom_owner_user.domid=#{domId}
+        AND t_dom_owner_user.ownerid=#{ownerId}
+        AND t_dom_owner_user.userid = #{userId} ;
+    </update>
+
+
+    <select id="queryUser" resultType="cn.itsmith.sysutils.resacl.entities.DomOwnerUser">
+        SELECT * FROM t_dom_owner_user WHERE
+        t_dom_owner_user.domid=#{domId}
+        AND t_dom_owner_user.userid = #{userId}
+         AND t_dom_owner_user.ownerid = #{ownerId};
+    </select>
+    <select id="queryUserBydomowner" resultType="cn.itsmith.sysutils.resacl.entities.DomOwnerUser">
+        SELECT * FROM t_dom_owner_user WHERE
+        t_dom_owner_user.domid=#{domId}
+        AND t_dom_owner_user.ownerid = #{ownerId};
+    </select>
+</mapper>

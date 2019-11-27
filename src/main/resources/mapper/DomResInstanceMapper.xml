@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.itsmith.sysutils.resacl.dao.DomResInstanceMapper">
+    <resultMap id="DomResInstance" type="cn.itsmith.sysutils.resacl.entities.DomResInstance">
+        <result property="id" column="id"/>
+        <result property="domId" column="domid"/>
+        <result property="ownerId" column="ownerid"/>
+        <result property="resId" column="resid"/>
+        <result property="resTypeId" column="restypeid"/>
+        <result property="resPid" column="respid"/>
+        <result property="status" column="status"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, domid, ownerid, resid, restypeid, respid, status
+    </sql>
+
+    <!--根据资源属主标识查询资源实例-->
+    <select id="selectByOwnerId" resultMap="DomResInstance" parameterType="int">
+        select
+        <include refid="Base_Column_List"/>
+        from t_dom_res_instance
+        where ownerid = #{ownerId}
+    </select>
+
+    <select id="select" resultMap="DomResInstance" parameterType="cn.itsmith.sysutils.resacl.entities.DomResInstance">
+        select
+        <include refid="Base_Column_List"/>
+        from t_dom_res_instance
+        where domid=#{domId} and ownerid=#{ownerId} and resid=#{resId} and restypeid=#{resTypeId}
+    </select>
+
+    <insert id="insert" parameterType="cn.itsmith.sysutils.resacl.entities.DomResInstance" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_dom_res_instance (domid, ownerid, restypeid, resid, ResPId, status)
+            VALUES (#{domId}, #{ownerId}, #{resTypeId}, #{resId}, #{resPid}, #{status} )
+    </insert>
+
+    <delete id="delete" >
+        delete
+        from t_dom_res_instance
+        where domid=#{domId, jdbcType=INTEGER} and ownerid=#{ownerId, jdbcType=INTEGER} and resid=#{resId, jdbcType=INTEGER} and restypeid=#{resTypeId, jdbcType=INTEGER}
+    </delete>
+
+    <update id="updateStatus" >
+        update t_dom_res_instance
+        <set>
+            status = #{status, jdbcType=INTEGER}
+        </set>
+        where domid=#{domId, jdbcType=INTEGER} and ownerid=#{ownerId, jdbcType=INTEGER} and resid=#{resId, jdbcType=INTEGER}
+    </update>
+
+<!--    liu-->
+    <select id="beingUsed" resultType="cn.itsmith.sysutils.resacl.entities.DomResInstance">
+        SELECT * FROM t_dom_res_instance
+    WHERE t_dom_res_instance.domid=#{domId}
+    AND t_dom_res_instance.ownerid=#{ownerId}
+    AND t_dom_res_instance.restypeid=#{resTypeId};
+    </select>
+</mapper>

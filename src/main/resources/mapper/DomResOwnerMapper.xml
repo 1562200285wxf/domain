@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.itsmith.sysutils.resacl.dao.DomResOwnerMapper">
+
+    <resultMap id="DomResOwner" type="cn.itsmith.sysutils.resacl.entities.DomResOwner">
+        <result property="domId" column="domid"/>
+        <result property="ownerId" column="ownerid"/>
+        <result property="ownerDes" column="ownerdes"/>
+        <result property="pId" column="pid"/>
+        <result property="status" column="status"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        domid,ownerid, ownerdes,pid, status
+    </sql>
+
+    <!--查询全部的资源属主信息-->
+    <select id="getAllDomResOwner" resultMap="DomResOwner">
+        select
+        <include refid="Base_Column_List"/>
+        from t_dom_res_owner
+    </select>
+
+<!--   根据属主标识查询属主信息-->
+    <select id="selectById" resultMap="DomResOwner">
+        select
+        <include refid="Base_Column_List"/>
+        from t_dom_res_owner
+        WHERE domid=#{domId, jdbcType=INTEGER} and ownerid=#{ownerId, jdbcType=INTEGER}
+    </select>
+
+
+    <!--新增域内资源属主-->
+    <insert id="insert" parameterType="cn.itsmith.sysutils.resacl.entities.DomResOwner" useGeneratedKeys="true" keyProperty="ownerId">
+        INSERT INTO t_dom_res_owner (domid, ownerdes, pid, status)
+            VALUES (#{domId}, #{ownerDes}, #{pId}, #{status})
+    </insert>
+
+    <!--修改资源属主描述-->
+    <update id="updateOwnerDes" >
+        update t_dom_res_owner
+        <set>
+            <if test="ownerDes != null">
+                ownerdes = #{ownerDes, jdbcType=VARCHAR}
+            </if>
+        </set>
+        where ownerid = #{ownerId, jdbcType=INTEGER}
+    </update>
+    <!--    根据属主标识删除属主-->
+    <delete id="deleteById" parameterType="int">
+        delete
+        from t_dom_res_owner
+        where ownerid=#{ownerId}
+    </delete>
+
+    <update id="updateStatus" parameterType="cn.itsmith.sysutils.resacl.entities.DomResOwner">
+        update t_dom_res_owner
+        <set>
+            status = #{status}
+        </set>
+        where domid=#{domId} and ownerid=#{ownerId}
+    </update>
+
+    <!--根据父节点查找属主信息-->
+    <select id="selectByPId" resultMap="DomResOwner">
+        select
+        <include refid="Base_Column_List"/>
+        from t_dom_res_owner
+        where domid=#{domId, jdbcType=INTEGER} and pid=#{pId, jdbcType=INTEGER}
+    </select>
+
+
+
+<!--    liu-->
+    <select id="queryAllOwnerId" resultType="java.lang.Integer">
+       SELECT ownerid FROM t_dom_res_owner where t_dom_res_owner.domid=#{domId}
+    </select>
+    <select id="queryAllOwnerIdFormUser" resultType="java.lang.Integer">
+        SELECT ownerid FROM t_dom_owner_user where t_dom_owner_user.domid=#{domId}
+    </select>
+    <select id="queryAllOwnerIdFromOwnerRes" resultType="java.lang.Integer">
+        SELECT ownerid FROM t_dom_owner_res where t_dom_owner_res.domid=#{domId}
+    </select>
+
+    <!--   根据属主标识查询属主信息-->
+    <select id="selectUById" resultType="cn.itsmith.sysutils.resacl.entities.DomResOwnerUU">
+        select
+        <include refid="Base_Column_List"/>
+        from t_dom_res_owner
+        WHERE domid=#{domId, jdbcType=INTEGER} and ownerid=#{ownerId, jdbcType=INTEGER}
+    </select>
+    <!--根据父节点查找属主信息-->
+    <select id="selectUByPId" resultType="cn.itsmith.sysutils.resacl.entities.DomResOwnerUU">
+        select
+        <include refid="Base_Column_List"/>
+        from t_dom_res_owner
+        where domid=#{domId, jdbcType=INTEGER} and pid=#{pId, jdbcType=INTEGER}
+    </select>
+
+    <!--   根据属主标识查询属主信息-->
+    <select id="selectRById" resultType="cn.itsmith.sysutils.resacl.entities.DomResOwnerR">
+        select
+        <include refid="Base_Column_List"/>
+        from t_dom_res_owner
+        WHERE domid=#{domId, jdbcType=INTEGER} and ownerid=#{ownerId, jdbcType=INTEGER}
+    </select>
+    <!--根据父节点查找属主信息-->
+    <select id="selectRByPId" resultType="cn.itsmith.sysutils.resacl.entities.DomResOwnerR">
+        select
+        <include refid="Base_Column_List"/>
+        from t_dom_res_owner
+        where domid=#{domId, jdbcType=INTEGER} and pid=#{pId, jdbcType=INTEGER}
+    </select>
+    <!--queryOwnerBydomowner-->
+    <select id="queryOwnerBydomowner" resultType="cn.itsmith.sysutils.resacl.entities.DomResOwner">
+        select *
+        from t_dom_res_owner
+        where domid=#{domId, jdbcType=INTEGER} and ownerId=#{ownerId, jdbcType=INTEGER}
+    </select>
+</mapper>

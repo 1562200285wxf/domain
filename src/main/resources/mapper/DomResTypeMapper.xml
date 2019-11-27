@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.itsmith.sysutils.resacl.dao.DomResTypeMapper">
+    <resultMap id="DomResType" type="cn.itsmith.sysutils.resacl.entities.DomResType">
+        <result property="domId" column="domid"/>
+        <result property="resTypeId" column="restypeid"/>
+        <result property="resTypeDes" column="restypedes"/>
+        <result property="pId" column="pid"/>
+        <result property="status" column="status"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        domid, restypeid, restypedes, pid, status
+    </sql>
+<!--根据id查询资源种类-->
+    <select id="selectById" resultMap="DomResType" parameterType="int">
+        select
+        <include refid="Base_Column_List"/>
+        from t_dom_res_type
+        where domid=#{domId, jdbcType=INTEGER} and restypeid=#{resTypeId, jdbcType=INTEGER}
+    </select>
+
+    <select id="selectByOwnerId" resultMap="DomResType" parameterType="int">
+        select
+        <include refid="Base_Column_List"/>
+        from t_dom_res_type
+        where ownerid=#{ownerId}
+    </select>
+
+
+<!--    liu-->
+    <insert id="addOwnerRes" useGeneratedKeys="true" keyProperty="id">
+        insert into t_dom_owner_res(domid, ownerid, restypeid,status) values (#{domId}, #{ownerId}, #{resTypeId},1);
+    </insert>
+    <select id="queryAllResIdByDomId" resultType="java.lang.Integer">
+        SELECT restypeid FROM t_dom_owner_res WHERE t_dom_owner_res.domid=#{domId} AND t_dom_owner_res.ownerid=#{ownerId};
+    </select>
+    <select id="queryAllResId2" resultType="java.lang.Integer">
+        SELECT restypeid FROM t_dom_res_type WHERE t_dom_res_type.domid=#{domId} ;
+    </select>
+
+    <update id="updataStatus">
+        update t_dom_owner_res SET status= 1 WHERE t_dom_owner_res.domid=#{domId}
+        AND t_dom_owner_res.ownerid = #{ownerId}
+        AND t_dom_owner_res.restypeid = #{resTypeId};
+    </update>
+
+    <!--<delete id="deleteType">-->
+        <!--DELETE FROM t_dom_owner_res-->
+        <!--WHERE t_dom_owner_res.domid=#{domId}-->
+        <!--AND t_dom_owner_res.ownerid=#{ownerId}-->
+        <!--AND t_dom_owner_res.restypeid = #{resTypeId}-->
+        <!--;-->
+    <!--</delete>-->
+    <update id="deleteType">
+        update t_dom_owner_res SET status= 0
+        WHERE t_dom_owner_res.domid=#{domId}
+        AND t_dom_owner_res.ownerid=#{ownerId}
+        AND t_dom_owner_res.restypeid = #{resTypeId}
+    </update>
+    <select id="queryOwnerRes" resultType="cn.itsmith.sysutils.resacl.entities.DomOwnerRes">
+        SELECT * FROM t_dom_owner_res
+        WHERE  t_dom_owner_res.domid=#{domId}
+        AND t_dom_owner_res.ownerid=#{ownerId}
+        AND t_dom_owner_res.restypeid = #{resTypeId};
+    </select>
+    <select id="queryResBydomowner" resultType="cn.itsmith.sysutils.resacl.entities.DomOwnerRes">
+        SELECT * FROM t_dom_owner_res
+        WHERE  t_dom_owner_res.domid=#{domId}
+        AND t_dom_owner_res.ownerid=#{ownerId}
+    </select>
+
+    <select id="queryResBase" resultType="cn.itsmith.sysutils.resacl.entities.DomResType">
+        SELECT * FROM t_dom_res_type
+        WHERE  t_dom_res_type.domid=#{domId}
+        AND t_dom_res_type.restypeid=#{resTypeId}
+    </select>
+    <select id="queryBaseByPid" resultType="cn.itsmith.sysutils.resacl.entities.DomResType">
+        SELECT * FROM t_dom_res_type
+        WHERE  t_dom_res_type.DomId=#{domId}
+        AND t_dom_res_type.PId=#{pId}
+    </select>
+
+<!--    wang-->
+    <select id="selectByPrimaryKey" resultMap="DomResType" parameterType="java.lang.Integer" >
+        select
+        <include refid="Base_Column_List" />
+        from t_dom_res_type
+        where restypeid = #{resTypeId,jdbcType=INTEGER}
+    </select>
+
+    <select id="getDomResTypes" resultMap="DomResType" parameterType="java.lang.Integer" >
+        select
+        <include refid="Base_Column_List" />
+        from t_dom_res_type
+        where domid = #{domid,jdbcType=INTEGER}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from t_dom_res_type
+    where restypeid = #{resTypeId,jdbcType=INTEGER}
+  </delete>
+    <insert id="insert" parameterType="cn.itsmith.sysutils.resacl.entities.DomResType" >
+    insert into t_dom_res_type (restypeid, domid, restypedes,
+      pid)
+    values (#{resTypeId,jdbcType=INTEGER}, #{domId,jdbcType=INTEGER}, #{resTypeDes,jdbcType=VARCHAR},
+      #{pid,jdbcType=INTEGER})
+  </insert>
+    <insert id="insertSelective" parameterType="cn.itsmith.sysutils.resacl.entities.DomResType" >
+        insert into t_dom_res_type
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="resTypeId != null" >
+                restypeid,
+            </if>
+            <if test="domId != null" >
+                domid,
+            </if>
+            <if test="resTypeDes != null" >
+                restypedes,
+            </if>
+            <if test="pid != null" >
+                pid,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="resTypeId != null" >
+                #{resTypeId,jdbcType=INTEGER},
+            </if>
+            <if test="domId != null" >
+                #{domId,jdbcType=INTEGER},
+            </if>
+            <if test="resTypeDes != null" >
+                #{resTypeDes,jdbcType=VARCHAR},
+            </if>
+            <if test="pid != null" >
+                #{pid,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="cn.itsmith.sysutils.resacl.entities.DomResType" >
+        update t_dom_res_type
+        <set >
+            <if test="domId != null" >
+                domid = #{domId,jdbcType=INTEGER},
+            </if>
+            <if test="resTypeDes != null" >
+                restypedes = #{resTypeDes,jdbcType=VARCHAR},
+            </if>
+            <if test="pid != null" >
+                pid = #{pid,jdbcType=INTEGER},
+            </if>
+        </set>
+        where restypeid = #{resTypeId,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="cn.itsmith.sysutils.resacl.entities.DomResType" >
+    update t_dom_res_type
+    set domid = #{domId,jdbcType=INTEGER},
+      restypedes = #{resTypeDes,jdbcType=VARCHAR},
+      pid = #{pid,jdbcType=INTEGER}
+    where restypeid = #{resTypeId,jdbcType=INTEGER}
+  </update>
+</mapper>
