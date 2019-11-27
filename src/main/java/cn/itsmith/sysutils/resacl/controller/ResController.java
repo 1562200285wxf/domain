@@ -27,8 +27,8 @@ public class ResController {
     DomainMapper domainMapper;
     @Autowired
     DomResOwnerMapper ownerMapper;
-    @Autowired
-    ResService resService;
+@Autowired
+ResService resService;
     @Autowired
     DomResOwnerService domResOwnerService1;
 
