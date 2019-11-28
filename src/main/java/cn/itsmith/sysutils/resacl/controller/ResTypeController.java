@@ -7,6 +7,7 @@ import cn.itsmith.sysutils.resacl.common.utilss.ChangeResourceTypeDes;
 import cn.itsmith.sysutils.resacl.common.utilss.DeleteResourceType;
 import cn.itsmith.sysutils.resacl.entities.DomResType;
 import cn.itsmith.sysutils.resacl.serviceImpl.DomResTypeServiceImpl;
+import cn.itsmith.sysutils.resacl.utils.ResultUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -34,8 +35,8 @@ public class ResTypeController {
             @ApiImplicitParam(name = "domResType", value = "资源种类", dataType = "DomResType",required = false,paramType = "body"),
     })
     @RequestMapping(value="/addResourceType",method = RequestMethod.POST)
-    public String addResourceType(@RequestBody DomResType domResType){
-        String result = resTypeServiceImpl.addResourceType(domResType);
+    public ResultUtils addResourceType(@RequestBody DomResType domResType){
+        ResultUtils result = resTypeServiceImpl.addResourceType(domResType);
         return result;
     }
 
@@ -44,12 +45,12 @@ public class ResTypeController {
             @ApiImplicitParam(name = "changeResourceTypeDes", value = "修改域资源种类描述", dataType = "ChangeResourceTypeDes",required = false,paramType = "body"),
     })
     @RequestMapping(value="/changeResourceTypeDes",method = RequestMethod.POST)
-    public String changeResourceTypeDes(@RequestBody ChangeResourceTypeDes changeResourceTypeDes){
+    public ResultUtils changeResourceTypeDes(@RequestBody ChangeResourceTypeDes changeResourceTypeDes){
         DomResType domResType = new DomResType();
         domResType.setDomId(changeResourceTypeDes.getDomid());
         domResType.setResTypeDes(changeResourceTypeDes.getRestypedes());
         domResType.setResTypeId(changeResourceTypeDes.getRestypeid());
-        String result = resTypeServiceImpl.changeResourceTypeDes(domResType);
+        ResultUtils result = resTypeServiceImpl.changeResourceTypeDes(domResType);
         return result;
 
     }
@@ -59,7 +60,7 @@ public class ResTypeController {
             @ApiImplicitParam(name = "deleteResourceType", value = "删除资源种类", dataType = "DeleteResourceType",required = false,paramType = "body"),
     })
     @RequestMapping(value="/deleteResourceType",method = RequestMethod.POST)
-    public String deleteResourceType(@RequestBody DeleteResourceType deleteResourceType){
+    public ResultUtils deleteResourceType(@RequestBody DeleteResourceType deleteResourceType){
         DomResType domResType = new DomResType();
         domResType.setDomId(deleteResourceType.getDomid());
         domResType.setResTypeId(deleteResourceType.getRestypeid());
@@ -72,7 +73,7 @@ public class ResTypeController {
             @ApiImplicitParam(name = "domid", value = "域id", dataType = "Integer",required = false,paramType = "query"),
     })
     @RequestMapping(value="/getDomResTypes",method = RequestMethod.GET)
-    public List<DomResType> getDomResTypes(Integer domid){
+    public ResultUtils getDomResTypes(Integer domid){
         return resTypeServiceImpl.getDomResTypes(domid);
     }
 }
