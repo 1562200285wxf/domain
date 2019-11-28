@@ -35,7 +35,7 @@ public enum ResponseInfo {
     OPEXTEND2_ERROR(5002, "该资源可用权限已经是不可继承"),
     OPCOMMON1_ERROR(5003, "该资源可用权限已经是通用的"),
     OPCOMMON2_ERROR(5004, "该资源可用权限已经是不通用的"),
-    //wang
+    //wang  我
     //认证异常
     DOMAIN_IS(2001,"域存在"),
     DOMAIN_NOT(2002,"域不存在"),
