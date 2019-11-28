@@ -5,7 +5,7 @@
         <result property="domId" column="domid"/>
         <result property="ownerId" column="ownerid"/>
         <result property="userId" column="userid"/>
-        <result property="isadmin" column="isadmin"/>
+        <result property="isAdmin" column="isadmin"/>
         <result property="status" column="status"/>
     </resultMap>
 
