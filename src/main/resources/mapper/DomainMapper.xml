@@ -6,6 +6,7 @@
         <result property="domDes" column="domdes"/>
         <result property="domToken" column="domtoken"/>
         <result property="status" column="status"/>
+        <result property="domName" column="domame"/>
     </resultMap>
 
     <sql id="Base_Column_List">
@@ -19,55 +20,32 @@
         from t_domain
         WHERE domid=#{domId, jdbcType=INTEGER} and domtoken=#{domToken, jdbcType=VARCHAR}
     </select>
-<!--///liu-->
+    <!--///liu-->
 
     <select id="varify" resultType="Integer">
     SELECT COUNT(*) FROM t_domain
     WHERE t_domain.domid=#{domId} AND t_domain.domtoken=#{domToken}
   </select>
 
-<!--    wang-->
+    <!--    wang-->
     <select id="selectByPrimaryKey" resultMap="Domain" parameterType="java.lang.Integer" >
         select
         <include refid="Base_Column_List" />
         from t_domain
         where domid = #{domId,jdbcType=INTEGER}
+        and status = #{1,jdbcType=INTEGER}
     </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from t_domain
     where domid = #{domId,jdbcType=INTEGER}
   </delete>
+
     <insert id="insert" parameterType="cn.itsmith.sysutils.resacl.entities.Domain" >
-    insert into t_domain (domid, domdes, domtoken
+    insert into t_domain (domdes, domtoken,status,domname
       )
-    values (#{domId,jdbcType=INTEGER}, #{domDes,jdbcType=VARCHAR}, #{domToken,jdbcType=CHAR}
+    values #{domDes,jdbcType=VARCHAR}, #{domToken,jdbcType=CHAR}, #{status,jdbcType=INTEGER}, #{domName,jdbcType=CHAR}
       )
   </insert>
-    <insert id="insertSelective" parameterType="cn.itsmith.sysutils.resacl.entities.Domain" >
-        insert into t_domain
-        <trim prefix="(" suffix=")" suffixOverrides="," >
-            <if test="domId != null" >
-                domid,
-            </if>
-            <if test="domDes != null" >
-                domdes,
-            </if>
-            <if test="domToken != null" >
-                domtoken,
-            </if>
-        </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides="," >
-            <if test="domId != null" >
-                #{domId,jdbcType=INTEGER},
-            </if>
-            <if test="domDes != null" >
-                #{domDes,jdbcType=VARCHAR},
-            </if>
-            <if test="domToken != null" >
-                #{domToken,jdbcType=CHAR},
-            </if>
-        </trim>
-    </insert>
     <update id="updateByPrimaryKeySelective" parameterType="cn.itsmith.sysutils.resacl.entities.Domain" >
         update t_domain
         <set >
@@ -76,6 +54,12 @@
             </if>
             <if test="domToken != null" >
                 domtoken = #{domToken,jdbcType=CHAR},
+            </if>
+            <if test="status != null" >
+                status = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="domName != null" >
+                domname = #{domName,jdbcType=INTEGER},
             </if>
         </set>
         where domid = #{domId,jdbcType=INTEGER}

@@ -2,10 +2,12 @@ package cn.itsmith.sysutils.resacl.serviceImpl;
 
 
 import cn.itsmith.sysutils.resacl.common.config.ResponseInfo;
-import cn.itsmith.sysutils.resacl.dao.DomainMapper;
 import cn.itsmith.sysutils.resacl.common.exception.FailedException;
+import cn.itsmith.sysutils.resacl.common.utilss.TokenUtil;
+import cn.itsmith.sysutils.resacl.dao.DomainMapper;
 import cn.itsmith.sysutils.resacl.entities.Domain;
 import cn.itsmith.sysutils.resacl.service.DomainService;
+import cn.itsmith.sysutils.resacl.utils.ResultUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,4 +37,22 @@ public class DomainServiceImpl implements DomainService {
         }
         return true;
     }
+
+    public ResultUtils addDomain(Domain domain){
+        ResultUtils resultUtils = new ResultUtils();
+        domain.setStatus(1);
+        if(domainMapper.insert(domain)==1){
+            resultUtils.setCode(ResponseInfo.SUCCESS_IS.getErrorCode());
+            resultUtils.setMessage(String.format("成功注册域%d描述为%d",
+                    domain.getDomId(), domain.getDomDes()));
+            resultUtils.setData(domain.getDomId());
+        }else {
+            throw new FailedException(String.format("未知错误，域描述为%d的注册失败失败",
+                    domain.getDomDes()));
+        }
+        return resultUtils;
+    }
+
+
+
 }
