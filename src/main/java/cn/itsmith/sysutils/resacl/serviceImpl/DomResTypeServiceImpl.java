@@ -7,6 +7,7 @@ import cn.itsmith.sysutils.resacl.dao.DomResTypeMapper;
 import cn.itsmith.sysutils.resacl.entities.DomResType;
 import cn.itsmith.sysutils.resacl.service.DomResTypeService;
 import cn.itsmith.sysutils.resacl.service.DomainService;
+import cn.itsmith.sysutils.resacl.utils.ResultUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,10 +43,10 @@ public class DomResTypeServiceImpl implements DomResTypeService {
     //wang
     @Autowired
     DomainService domainService;
-   @Autowired
+    @Autowired
 //    DomainServiceImpl domainService;
 //    DomResTypeMapper  domResTypeMapper;
-    DomOwnerResMapper domOwnerResMapper;
+            DomOwnerResMapper domOwnerResMapper;
 //    public  DomResTypeServiceImpl(DomResTypeMapper domResTypeMapper,DomainServiceImpl domainService,DomOwnerResMapper domOwnerResMapper){
 //        this.domResTypeMapper = domResTypeMapper;
 //        this.domainService = domainService;
@@ -59,75 +60,115 @@ public class DomResTypeServiceImpl implements DomResTypeService {
     //2 如果是根节点，则必须都是0
     //4判断插入种类的根节点是偶存在。
     @Override
-    public String addResourceType(DomResType domResType) {
+    public ResultUtils addResourceType(DomResType domResType) {
+        ResultUtils resultUtils = new ResultUtils();
         boolean type = domainService.isDomain(domResType.getDomId());
         if(!type){
-            return "域"+domResType.getDomId()+"不存在";
+            resultUtils.setCode(ResponseInfo.DOMAIN_NOT.getErrorCode());
+            resultUtils.setMessage("域标识为"+domResType.getDomId()+"的不存在");
+            return resultUtils;
         }
         if(domResTypeMapper.selectByPrimaryKey(domResType.getResTypeId()) != null){
-            return "此种类"+domResType.getResTypeId()+"已经存在";
+            resultUtils.setCode(ResponseInfo.SUCCESS_IS.getErrorCode());
+            resultUtils.setMessage(String.format("种类为标识为%d的种类已经是t_dom_res_type成员,，添加失败",domResType.getResTypeId()));
+            return resultUtils;
         }
         if(domResType.getResTypeId()==0){
             if(domResType.getPId()!=0) {
-                return "节点为0的父节点也必须是0";
+                resultUtils.setCode(ResponseInfo.FALSE_IS.getErrorCode());
+                resultUtils.setMessage("资源种类为"+domResType.getResTypeId()+"添加失败节点为0的父节点也必须是0");
+                return resultUtils;
             }
             if(domResType.getPId()==0) {
                 domResTypeMapper.insertSelective(domResType);
-                return "种类"+domResType.getResTypeId()+"是t_dom_res_type成员";
+                resultUtils.setCode(ResponseInfo.SUCCESS_IS.getErrorCode());
+                resultUtils.setMessage(String.format("种类为标识为%d的种类已经是t_dom_res_type成员",domResType.getResTypeId()));
+                return resultUtils;
             }
         }
         if( domResType.getResTypeId()!=0 && domResTypeMapper.selectByPrimaryKey(domResType.getPId())==null ){
-            return "父级节点"+domResType.getPId()+"不存在";
+            resultUtils.setCode(ResponseInfo.FALSE_IS.getErrorCode());
+            resultUtils.setMessage(String.format("种类为标识为%d的种类的父级节点%d不存在",domResType.getResTypeId(),domResType.getPId()));
+            return resultUtils;
         }
         domResTypeMapper.insertSelective(domResType);
-        return "域"+domResType.getDomId()+"资源种类"+domResType.getResTypeId()+"成功添加";
+        resultUtils.setCode(ResponseInfo.SUCCESS_IS.getErrorCode());
+        resultUtils.setMessage(String.format("种类为标识为%d的种类已经是t_dom_res_type成员",domResType.getResTypeId()));
+        return resultUtils;
     }
 
     //1 判断域是否存在
     //2 判断此类是否已经存在
     //3进行操作，返回结果
     @Override
-    public String changeResourceTypeDes(DomResType domResType) {
+    public ResultUtils changeResourceTypeDes(DomResType domResType) {
+        ResultUtils resultUtils = new ResultUtils();
         boolean type = domainService.isDomain(domResType.getDomId());
         if(!type){
-            return "域"+domResType.getDomId()+"不存在";
+            resultUtils.setCode(ResponseInfo.DOMAIN_NOT.getErrorCode());
+            resultUtils.setMessage(String.format("域标识为%d的不存在，节点%d添加失败",domResType.getDomId(),domResType.getResTypeId()));
+            return resultUtils;
         }
         if(domResTypeMapper.selectByPrimaryKey(domResType.getResTypeId()) == null){
-            return "此种类"+domResType.getResTypeId()+"不存在";
+            resultUtils.setCode(ResponseInfo.FALSE_IS.getErrorCode());
+            resultUtils.setMessage(String.format("种类为标识为%d的种类不是t_dom_res_type成员,，修改失败",domResType.getResTypeId()));
+            return resultUtils;
         }
         domResTypeMapper.updateByPrimaryKeySelective(domResType);
-        return "域"+domResType.getDomId()+"资源种类描述"+domResType.getResTypeDes()+"成功修改";
+        resultUtils.setCode(ResponseInfo.FALSE_IS.getErrorCode());
+        resultUtils.setMessage(String.format("种类为标识为%d的种类不是t_dom_res_type成员,，修改失败",domResType.getResTypeId()));
+        return resultUtils;
     }
 
     @Override
-    public String deleteResourceType(DomResType domResType) {
+    public ResultUtils deleteResourceType(DomResType domResType) {
+        ResultUtils resultUtils = new ResultUtils();
         boolean type = domainService.isDomain(domResType.getDomId());
         if(!type){
-            return "域"+domResType.getDomId()+"不存在";
+            resultUtils.setCode(ResponseInfo.DOMAIN_NOT.getErrorCode());
+            resultUtils.setMessage(String.format("域标识为%d的不存在，节点%d删除失败",domResType.getDomId(),domResType.getResTypeId()));
+            return resultUtils;
         }
         if(domResTypeMapper.selectByPrimaryKey(domResType.getResTypeId()) == null){
-            return "此种类"+domResType.getResTypeId()+"不存在";
+            resultUtils.setCode(ResponseInfo.FALSE_IS.getErrorCode());
+            resultUtils.setMessage(String.format("种类为标识为%d的种类不是t_dom_res_type成员,，删除失败",domResType.getResTypeId()));
+            return resultUtils;
         }
-        //如果此节点的pid项不是任何资源种类的子节点，才能继续判断
-        List<DomResType> allDomResTypes=getDomResTypes(domResType.getDomId());
+        //如果此节点的id项不是任何资源种类的父节点，才能继续判断
+        List<DomResType> allDomResTypes=getDomResType(domResType.getDomId());
         for (DomResType item : allDomResTypes) {
             if (item.getPId() ==domResType.getResTypeId() ) {
-                return domResType.getResTypeId()+"资源种类有用，不可以删除";
+                resultUtils.setCode(ResponseInfo.FALSE_IS.getErrorCode());
+                resultUtils.setMessage(String.format("种类为标识为%d的种类有用，删除失败",domResType.getResTypeId()));
+                return resultUtils;
             }
         }
         //如果在属组拥有资源里面有，则不可以删除。
         if(domOwnerResMapper.selectByPrimaryKey(domResType.getResTypeId()) != null) {
-            return domResType.getResTypeId()+"资源种类有用，不可以删除";
+            resultUtils.setCode(ResponseInfo.FALSE_IS.getErrorCode());
+            resultUtils.setMessage(String.format("种类为标识为%d的种类有用，删除失败",domResType.getResTypeId()));
+            return resultUtils;
         }
         domResTypeMapper.deleteByPrimaryKey(domResType.getResTypeId());
-        return domResType.getResTypeId()+"资源种类,已经从表资源属组删除";
+        resultUtils.setCode(ResponseInfo.SUCCESS_IS.getErrorCode());
+        resultUtils.setMessage(String.format("种类为标识为%d的种类，删除成功",domResType.getResTypeId()));
+        resultUtils.setData(domResType);
+        return resultUtils;
     }
 
-    public List<DomResType> getDomResTypes(Integer domid){
+    public ResultUtils getDomResTypes(Integer domid){
+        ResultUtils resultUtils = new ResultUtils();
         boolean type = domainService.isDomain(domid);
         if(!type){
             throw new FailedException(ResponseInfo.DOMAIN_NOT.getErrorCode(),"域"+domid+ ResponseInfo.DOMAIN_NOT.getErrorMsg());
         }
+        List<DomResType> list = domResTypeMapper.getDomResTypes(domid);
+        resultUtils.setCode(ResponseInfo.SUCCESS_IS.getErrorCode());
+        resultUtils.setMessage(String.format("域标识为%d的所有种类，删除成功",domid));
+        resultUtils.setData(list);
+        return resultUtils;
+    }
+    public List<DomResType>   getDomResType(Integer domid){
         return domResTypeMapper.getDomResTypes(domid);
     }
 }
