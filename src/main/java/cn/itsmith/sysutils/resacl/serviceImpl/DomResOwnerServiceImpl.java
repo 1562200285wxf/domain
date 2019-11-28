@@ -105,6 +105,19 @@ public class DomResOwnerServiceImpl implements DomResOwnerService {
      */
     @Override
     public ResultUtils getDomResOwnerTree(int domId, int ownerId){
+        if(ownerId==0){
+            DomResOwner domResOwner = new DomResOwner();
+            domResOwner.setDomId(domId);
+            domResOwner.setOwnerId(ownerId);
+            DomResOwnerNode domResOwnerNode1 = new DomResOwnerNode(domResOwner);
+            DomResOwnerNode domResOwnerNode = createDomResOwnerTree(domResOwnerNode1);
+            ResultUtils resultUtils = new ResultUtils();
+            resultUtils.setCode(ResponseInfo.SUCCESS.getErrorCode());
+            resultUtils.setMessage(String.format(
+                    "成功获取标识为%d的域下所有属主树", domId));
+            resultUtils.setData(domResOwnerNode);
+            return resultUtils;
+        }
         DomResOwner domResOwner = domResOwnerMapper.selectById(domId, ownerId);
         //生成头节点
         DomResOwnerNode domResOwnerNode1 = new DomResOwnerNode(domResOwner);

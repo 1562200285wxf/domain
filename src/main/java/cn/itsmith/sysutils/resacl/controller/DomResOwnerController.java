@@ -163,6 +163,7 @@ public class DomResOwnerController {
         //根据令牌和domain判断请求请求是否正确
         domainService.verify(domId, Auth);
         //先根据资源属主标识查找是否存在此资源属主
+        if(ownerId!=0)
         if(!domResOwnerService.ownerExist(domId, ownerId))
             throw new FailedException(ResponseInfo.GETOWNER_ERROR.getErrorCode(),
                     String.format("域标识为%d的域下不存在标识为%d的属主,获取属主树失败", domId, ownerId));
