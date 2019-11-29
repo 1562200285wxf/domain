@@ -9,6 +9,7 @@ import cn.itsmith.sysutils.resacl.utils.ResultUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Iterator;
 import java.util.List;
 @Service(value="DomResOwnerService")
 public class DomResOwnerServiceImpl implements DomResOwnerService {
@@ -185,6 +186,13 @@ public class DomResOwnerServiceImpl implements DomResOwnerService {
     public void ownerUsing(int domId, int ownerId) {
         //根据资源属主标识查找所有属主中有没有以该节点为父节点
         List<DomResOwner> domResOwners = domResOwnerMapper.selectByPId(domId, ownerId);
+        Iterator<DomResOwner> domResOwnersIt = domResOwners.iterator();
+        while(domResOwnersIt.hasNext()){
+            DomResOwner domResOwner = domResOwnersIt.next();
+            if(domResOwner.getStatus()==0){
+                domResOwnersIt.remove();
+            }
+        }
         if(domResOwners.size() != 0) {
             String ownersId = "";
             for(DomResOwner domResOwner : domResOwners)
@@ -195,6 +203,13 @@ public class DomResOwnerServiceImpl implements DomResOwnerService {
         }
         //看属主成员中有没有存在该属主的成员
         List<DomOwnerUser> domOwnerUsers = domOwnerUserMapper.selectByDomId(ownerId);
+        Iterator<DomOwnerUser> domOwnerUsersIt = domOwnerUsers.iterator();
+        while(domOwnerUsersIt.hasNext()){
+            DomOwnerUser domOwnerUser = domOwnerUsersIt.next();
+            if(domOwnerUser.getStatus()==0){
+                domOwnerUsersIt.remove();
+            }
+        }
         if(domOwnerUsers.size()!= 0){
             String usersId = "";
             for(DomOwnerUser domOwnerUser : domOwnerUsers)
@@ -204,10 +219,17 @@ public class DomResOwnerServiceImpl implements DomResOwnerService {
                             domId, ownerId, usersId));
         }
         //看该属主是否拥有资源种类
-        List<DomOwnerRes> domOwnerRes = domOwnerResMapper.selectByOwnerId(ownerId);
-        if(domOwnerRes.size()!= 0){
+        List<DomOwnerRes> domOwnerRess = domOwnerResMapper.selectByOwnerId(ownerId);
+        Iterator<DomOwnerRes> domOwnersRessIt = domOwnerRess.iterator();
+        while(domOwnersRessIt.hasNext()){
+            DomOwnerRes domOwnerRes = domOwnersRessIt.next();
+            if(domOwnerRes.getStatus()==0){
+                domOwnersRessIt.remove();
+            }
+        }
+        if(domOwnerRess.size()!= 0){
             String typesId = "";
-            for(DomOwnerRes domOwnerRes1 : domOwnerRes)
+            for(DomOwnerRes domOwnerRes1 : domOwnerRess)
                 typesId = String.format("%s %d", typesId, domOwnerRes1.getResTypeId());
             throw new FailedException(ResponseInfo.OWNERUSINGT_ERROR.getErrorCode(),
                     String.format("域标识为%d的域下的标识为%d的属主还存在标识为%s的资源种类,不能删除",
