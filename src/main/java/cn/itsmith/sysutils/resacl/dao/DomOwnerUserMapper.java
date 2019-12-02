@@ -1,6 +1,7 @@
 package cn.itsmith.sysutils.resacl.dao;
 
 import cn.itsmith.sysutils.resacl.entities.DomOwnerUser;
+import cn.itsmith.sysutils.resacl.entities.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -38,8 +39,10 @@ public interface DomOwnerUserMapper {
     public List<DomOwnerUser> queryUserBydomowner(@Param("domId") Integer domId, @Param("ownerId") Integer ownerId);
 
 
-    //    //级联查询
-//    public DomOwnerUser queryUser(String id);
+   //查询名字
+    public String queryUserName(Integer userId);
+    //查询所有基本表select *
+    public List<User> getAllBase();
     //级联删除user
     public int deleteUserCascading(String id);
 

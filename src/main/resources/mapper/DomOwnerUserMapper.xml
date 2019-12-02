@@ -81,6 +81,14 @@
     <select id="queryUserBydomowner" resultType="cn.itsmith.sysutils.resacl.entities.DomOwnerUser">
         SELECT * FROM t_dom_owner_user WHERE
         t_dom_owner_user.domid=#{domId}
-        AND t_dom_owner_user.ownerid = #{ownerId};
+        AND t_dom_owner_user.ownerid = #{ownerId}
+        AND t_dom_owner_user.status=1;
+    </select>
+    <select id="queryUserName" resultType="java.lang.String">
+        SELECT username FROM t_user WHERE
+        t_user.userid=#{userId}
+    </select>
+    <select id="getAllBase" resultType="cn.itsmith.sysutils.resacl.entities.User">
+        SELECT * FROM t_user
     </select>
 </mapper>

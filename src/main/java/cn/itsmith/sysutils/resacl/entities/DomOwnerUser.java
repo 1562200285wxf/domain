@@ -12,4 +12,6 @@ public class DomOwnerUser {
     //  是本域，本属主中。0代表普通成员 1代表管理员
     Integer isAdmin;
     Integer status;
+    String userName;
+
 }

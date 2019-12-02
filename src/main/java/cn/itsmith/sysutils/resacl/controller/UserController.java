@@ -185,6 +185,31 @@ public ResultUtils queryUserTree(@RequestParam(value="domId",required = true) In
 
     }
 
+    @ApiOperation(value = "查询特定属主下的成员们", notes = "针对属主成员的查询操作")
+    @RequestMapping(value="/queryusers/{domId}",method = RequestMethod.GET)
+    public ResultUtils queryUsers(@PathVariable Integer domId,
+                                  @RequestParam(value="ownerId",required = true) Integer ownerId,
+                                  @RequestHeader(value = "Validate", required = true) String validate) {
+
+        Integer varifycode  = domainMapper.varify(domId,validate);
+        DomOwnerUser domOwnerUser = new DomOwnerUser();
+        domOwnerUser.setDomId(domId);
+        domOwnerUser.setOwnerId(ownerId);
+
+        if(varifycode!=1){
+            throw new FailedException(ResponseInfo.AUTH_FAILED.getErrorCode(),
+                    "不能查询域"+domId+"下的属主"+ownerId+"拥有的成员树，因为"+
+                            ResponseInfo.AUTH_FAILED.getErrorMsg());
+        }else if(!(domResOwnerService1.ownerExist(domId,ownerId))){
+            throw new FailedException(ResponseInfo.OWNER_FAILED.getErrorCode(),
+                    "查询失败，因为域"+domId+"下的属主"+ownerId+"不存在"
+            );
+        }else {
+            return userService.queryUsers(domOwnerUser);
+        }
+    }
+
+
 
 
 

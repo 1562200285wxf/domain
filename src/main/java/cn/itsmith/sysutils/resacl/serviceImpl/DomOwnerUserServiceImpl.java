@@ -51,16 +51,35 @@ public class DomOwnerUserServiceImpl implements DomOwnerUserService {
         if(domResOwnerUU ==null||domResOwnerUU.getStatus().equals(0)){
             throw new FailedException(1002,"属主"+domResOwnerUU.getOwnerId()+"不存在");
         }
+
+        DomResOwnerUU domResOwnerUU0 = new DomResOwnerUU();
+        domResOwnerUU0.setDomId(0);
+        DomResOwnerUNode domResOwnerUNode0 = new DomResOwnerUNode(domResOwnerUU0);//假头
+
         List<DomOwnerUser> users = domOwnerUserMapper.queryUserBydomowner(domId, ownerId);
+        for (DomOwnerUser domOwnerUser:
+        users) {
+            Integer userId = domOwnerUser.getUserId();
+            String userName = domOwnerUserMapper.queryUserName(userId);
+            if(userName!=null){
+                domOwnerUser.setUserName(userName);
+            }
+
+
+        }
 //        if(users==null){
 //            throw new FailedException(ResponseInfo.NONUSER_ERROR3.getErrorCode(), ResponseInfo.NONUSER_ERROR3.getErrorMsg());
 //        }
+
         domResOwnerUU.setOwnerUsers(users);
         //生成头节点
         DomResOwnerUNode domResOwnerNode1 = new DomResOwnerUNode(domResOwnerUU);
         //递归生成子树
         int countReal = 0;
         DomResOwnerUNode domResOwnerNode = createOwnerResTree(domResOwnerNode1);
+        //加入假头
+        domResOwnerUNode0.getChildList().add(domResOwnerNode);
+        //
         List<DomResOwnerUNode> childList = domResOwnerNode.getChildList();
         if(childList!=null){
             for (DomResOwnerUNode domResOwnerUNode:
@@ -74,12 +93,14 @@ public class DomOwnerUserServiceImpl implements DomOwnerUserService {
         ResultUtils resultUtils = new ResultUtils(
                 ResponseInfo.SUCCESS.getErrorCode(),
                 ResponseInfo.SUCCESS.getErrorMsg(),
-                domResOwnerNode);
+                domResOwnerUNode0);
 //        resultUtils.setCode(ResponseInfo.SUCCESS.getErrorCode());
 //        resultUtils.setMessage(ResponseInfo.SUCCESS.getErrorMsg());
 //        resultUtils.setData(domResOwnerNode);
         return resultUtils;
     }
+
+
 
     /**
      * 递归函数，传入树节点生成一个树，返回树的头节点
@@ -104,6 +125,17 @@ public class DomOwnerUserServiceImpl implements DomOwnerUserService {
 //                throw new FailedException(ResponseInfo.NONUSER_ERROR3.getErrorCode(), ResponseInfo.NONUSER_ERROR3.getErrorMsg());
 //            }
 
+            for (DomOwnerUser domOwnerUser:
+                    users) {
+                Integer userId = domOwnerUser.getUserId();
+                String userName = domOwnerUserMapper.queryUserName(userId);
+                System.out.println("+++++++++++userName"+userName);
+                if(userName!=null){
+                    domOwnerUser.setUserName(userName);
+                }
+
+
+            }
             domResOwnerUU1.setOwnerUsers(users);
 
 

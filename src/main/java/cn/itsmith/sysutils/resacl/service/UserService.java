@@ -11,4 +11,9 @@ public interface UserService {
     ResultUtils delUser(DomOwnerUser domOwnerUser);
     ResultUtils setAdmin(DomOwnerUser domOwnerUser);
     ResultUtils concelAdmin(DomOwnerUser domOwnerUser);
+    //查询在特定属主下的domUsers
+    ResultUtils queryUsers(DomOwnerUser domOwnerUser);
+    //查询特定属主下不存在的基本Users
+    ResultUtils queryBaseUsers(DomOwnerUser domOwnerUser);
+
 }

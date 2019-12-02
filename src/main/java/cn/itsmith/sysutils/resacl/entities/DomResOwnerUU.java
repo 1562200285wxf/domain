@@ -13,4 +13,5 @@ public class DomResOwnerUU {
     List<DomOwnerUser> ownerUsers;
 
     Integer status;
+    String ownerName;
 }
