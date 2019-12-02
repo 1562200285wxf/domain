@@ -9,6 +9,7 @@ public class DomResOperationA {
     Integer domId;
     Integer resTypeId;
     Integer opId;
+    String opName;
     String opDes;
     Integer isExtend;
     Integer isCommon;

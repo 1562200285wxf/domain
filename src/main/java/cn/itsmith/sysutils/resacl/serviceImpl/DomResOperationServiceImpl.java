@@ -34,7 +34,7 @@ public class DomResOperationServiceImpl implements DomResOperationService {
             resultUtils.setCode(ResponseInfo.SUCCESS.getErrorCode());
             resultUtils.setMessage(String.format("成功为标识为%d的域下标识为%d的资源种类添加标识为%d的资源可用权限",
                     domResOperation.getDomId(), domResOperation.getResTypeId(), domResOperation.getOpId()));
-            resultUtils.setData(domResOperation.getOpId());
+            resultUtils.setData(domResOperation.getId());
         }else {
             throw new FailedException(String.format("未知错误，为标识为%d的域下标识为%d的资源种类添加资源可用权限失败",
                     domResOperation.getDomId(), domResOperation.getResTypeId()));

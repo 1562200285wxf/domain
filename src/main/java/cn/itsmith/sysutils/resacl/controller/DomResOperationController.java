@@ -62,6 +62,7 @@ public class DomResOperationController {
         domResOperation.setDomId(domResOperationA.getDomId());
         domResOperation.setResTypeId(domResOperationA.getResTypeId());
         domResOperation.setOpId(domResOperationA.getOpId());
+        domResOperation.setOpName(domResOperationA.getOpName());
         domResOperation.setOpDes(domResOperationA.getOpDes());
         domResOperation.setIsExtend(domResOperationA.getIsExtend());
         domResOperation.setIsCommon(domResOperationA.getIsCommon());
