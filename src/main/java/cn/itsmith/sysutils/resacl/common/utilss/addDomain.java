@@ -5,6 +5,7 @@ import lombok.Data;
 //域，
 @Data
 public class addDomain {
+    //注释
     String domDes;
     String domName;
 
