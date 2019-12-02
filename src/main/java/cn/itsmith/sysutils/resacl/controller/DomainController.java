@@ -13,6 +13,8 @@ import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Api(value="域Controller",tags={"域的增删改查Api"})
 @RestController
 @RequestMapping("/DomainController")
@@ -30,10 +32,10 @@ public class DomainController {
             "9999 服务器异常 操作失败\n" +
             "...")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "domain", value = "域", dataType = "Domain",required = false,paramType = "body"),
+            @ApiImplicitParam(name = "adddomain", value = "域", dataType = "addDomain",required = true,paramType = "body"),
     })
-    @RequestMapping(value="/registerDomain",method = RequestMethod.GET)
-    public ResultUtils registerDomain(addDomain adddomain){
+    @RequestMapping(value="/registerDomain",method = RequestMethod.POST)
+    public ResultUtils registerDomain(@RequestBody addDomain adddomain){
         //默认初始域令牌123456
         Domain domain = new Domain();
         domain.setDomDes(adddomain.getDomDes());
@@ -53,10 +55,11 @@ public class DomainController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "domid", value = "域id", dataType = "Integer",required = false,paramType = "query"),
     })
-    @RequestMapping(value="/Token",method = RequestMethod.GET)
+    @RequestMapping(value="/produceDomainToken",method = RequestMethod.GET)
     public ResultUtils produceDomainToken(Integer domid){
         ResultUtils resultUtils = new ResultUtils();
         Domain domain = domainMapper.selectByPrimaryKey(domid);
+
         if(domain == null){
             resultUtils.setCode(ResponseInfo.DOMAIN_NOT.getErrorCode());
             resultUtils.setMessage(String.format("域标识为%d的不存在", domid));
@@ -71,8 +74,9 @@ public class DomainController {
             resultUtils.setMessage(String.format("成功为标识为%d的域下添加域token",
                     domid)+Token);
             resultUtils.setData(domain.getDomId());
+            return resultUtils;
         }
-        throw new FailedException(ResponseInfo.FALSE_IS.getErrorCode(), ResponseInfo.FALSE_IS.getErrorMsg());
+        throw new FailedException(ResponseInfo.FALSE_IS.getErrorCode(), ResponseInfo.FALSE_IS.getErrorMsg()+domain.getDomDes());
     }
 
     //  1判断domid是否符合类型？？？？？？？？？？？？？？？？
@@ -135,34 +139,52 @@ public class DomainController {
     // 2进行对象移植，修改操作
     // 3查找是否操作成功
     @ApiOperation(value = "修改域描述", notes = "针对域查询域修改域描述操作  \n" +
-            "修改成功代码：200  \n" +
+            "修改成功代码：2003  \n" +
             "服务器异常 操作失败 9999 \n" +
             "域不存在   2001  \n" +
             "...")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "updateDomainDes", value = "修改域描述", dataType = "UpdateDomainDes",required = false,paramType = "body"),
+            @ApiImplicitParam(name = "updateDomainDes", value = "修改域描述", dataType = "UpdateDomainDes",required = true,paramType = "body"),
     })
     @RequestMapping(value="/updateDomainDes",method = RequestMethod.POST)
-    public ResultUtils modifyDomainDes(@RequestBody  UpdateDomainDes updateDomainDes) {
+    public ResultUtils modifyDomainDes(@RequestBody UpdateDomainDes updateDomainDes) {
         ResultUtils resultUtils = new ResultUtils();
-        Domain domain = domainMapper.selectByPrimaryKey(updateDomainDes.getDomid());
+        Domain domain = domainMapper.selectByPrimaryKey(updateDomainDes.getDomId());
         Domain updateDomain = new Domain();
         if(domain == null){
             resultUtils.setCode(ResponseInfo.DOMAIN_NOT.getErrorCode());
-            resultUtils.setMessage("域标识为"+updateDomainDes.getDomid()+"的不存在");
+            resultUtils.setMessage("域标识为"+updateDomainDes.getDomId()+"的不存在");
             return resultUtils;
         }
         if (domain != null) {
-            updateDomain.setDomId(updateDomainDes.getDomid());
-            updateDomain.setDomDes(updateDomainDes.getDomdes());
+            updateDomain.setDomId(updateDomainDes.getDomId());
+            updateDomain.setDomDes(updateDomainDes.getDomDes());
+            updateDomain.setDomName(updateDomainDes.domName);
             domainMapper.updateByPrimaryKeySelective(updateDomain);
             resultUtils.setCode(ResponseInfo.SUCCESS_IS.getErrorCode());
             resultUtils.setMessage(String.format("成功修改标识为%d的域的描述为",
-                    updateDomainDes.getDomid())+updateDomainDes.domdes);
-            resultUtils.setData(updateDomainDes.getDomid());
+                    updateDomainDes.getDomId())+updateDomainDes.domDes);
+            resultUtils.setData(updateDomainDes.getDomId());
             return resultUtils;
         } else
-            throw new FailedException(ResponseInfo.SERVER_ERROR.getErrorCode(), "修改失败"+updateDomainDes.getDomid());
+            throw new FailedException(ResponseInfo.SERVER_ERROR.getErrorCode(), "修改失败"+updateDomainDes.getDomId());
+    }
+
+    @RequestMapping(value="/getAllDomain",method = RequestMethod.GET)
+    public ResultUtils getAllDomain(){
+        ResultUtils resultUtils = new ResultUtils();
+        List<Domain> list = domainMapper.getAllDomain();
+        if(list == null){
+            resultUtils.setCode(ResponseInfo.FALSE_IS.getErrorCode());
+            resultUtils.setMessage("没有数据");
+            resultUtils.setData(null);
+        }
+        if(list != null) {
+            resultUtils.setCode(ResponseInfo.SUCCESS_IS.getErrorCode());
+            resultUtils.setMessage("成功获取所有域");
+            resultUtils.setData(list);
+        }
+        return resultUtils;
     }
 
 }

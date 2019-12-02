@@ -20,11 +20,11 @@ public interface DomainMapper {
 
     int insert(Domain record);
 
-    int insertSelective(Domain record);
-
     Domain selectByPrimaryKey(Integer domId);
 
     int updateByPrimaryKeySelective(Domain record);
 
     int updateByPrimaryKey(Domain record);
+
+    List<Domain> getAllDomain();
 }

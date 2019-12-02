@@ -6,11 +6,11 @@
         <result property="domDes" column="domdes"/>
         <result property="domToken" column="domtoken"/>
         <result property="status" column="status"/>
-        <result property="domName" column="domame"/>
+        <result property="domName" column="domname"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        domid, domdes, domtoken, status
+        domid, domdes, domtoken, status,domname
     </sql>
 
     <!--根据id查询域信息-->
@@ -28,12 +28,17 @@
   </select>
 
     <!--    wang-->
+    <select id="getAllDomain"  resultMap="Domain">
+        select *
+        from t_domain
+        WHERE status=1
+    </select>
     <select id="selectByPrimaryKey" resultMap="Domain" parameterType="java.lang.Integer" >
         select
         <include refid="Base_Column_List" />
         from t_domain
         where domid = #{domId,jdbcType=INTEGER}
-        and status = #{1,jdbcType=INTEGER}
+        and status = 1
     </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from t_domain
@@ -41,9 +46,9 @@
   </delete>
 
     <insert id="insert" parameterType="cn.itsmith.sysutils.resacl.entities.Domain" >
-    insert into t_domain (domdes, domtoken,status,domname
+    insert into t_domain (domdes,domname, domtoken,status
       )
-    values #{domDes,jdbcType=VARCHAR}, #{domToken,jdbcType=CHAR}, #{status,jdbcType=INTEGER}, #{domName,jdbcType=CHAR}
+    values (#{domDes,jdbcType=VARCHAR}, #{domName,jdbcType=CHAR}, #{domToken,jdbcType=CHAR}, #{status,jdbcType=INTEGER}
       )
   </insert>
     <update id="updateByPrimaryKeySelective" parameterType="cn.itsmith.sysutils.resacl.entities.Domain" >

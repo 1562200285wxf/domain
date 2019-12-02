@@ -43,12 +43,11 @@ public class DomainServiceImpl implements DomainService {
         domain.setStatus(1);
         if(domainMapper.insert(domain)==1){
             resultUtils.setCode(ResponseInfo.SUCCESS_IS.getErrorCode());
-            resultUtils.setMessage(String.format("成功注册域%d描述为%d",
-                    domain.getDomId(), domain.getDomDes()));
+            resultUtils.setMessage(String.format("成功注册域%d描述为"+domain.getDomDes(),
+                    domain.getDomId()));
             resultUtils.setData(domain.getDomId());
         }else {
-            throw new FailedException(String.format("未知错误，域描述为%d的注册失败失败",
-                    domain.getDomDes()));
+            throw new FailedException("未知错误，域描述为"+domain.getDomDes()+"的注册失败失败");
         }
         return resultUtils;
     }
