@@ -211,22 +211,28 @@ public class UserServiceImp implements UserService {
     @Override
     public ResultUtils queryBaseUsers(DomOwnerUser domOwnerUser) {
         List<User> allBase = userMapper.getAllBase();
+        //这个查询只查询了status=1
         List<DomOwnerUser> allDomUsers = userMapper.queryUserBydomowner(domOwnerUser.getDomId(), domOwnerUser.getOwnerId());
         //ArrayList<User> temp = new ArrayList<>();
-//待删的集合一定要用迭代器，不然报错
-        Iterator<User> it = allBase.iterator();
-        while(it.hasNext()) {
-            for (DomOwnerUser domOwnerUser1:
-                    allDomUsers) {
-                if(it.next().getUserId().equals(domOwnerUser1.getUserId())){
-                    allBase.remove(it.next());
+
+        if(allDomUsers.size()!=0){
+            //待删的集合一定要用迭代器，不然报错
+            Iterator<User> it = allBase.iterator();
+            while(it.hasNext()) {
+                User user = it.next();
+                for (DomOwnerUser domOwnerUser1:
+                allDomUsers) {
+                    if(user.getUserId().equals(domOwnerUser1.getUserId())){
+                        //allBase.remove(it.next());
+                        it.remove();
+                        break;
+                    }
                 }
             }
-            }
+            return resultUniteServiceImp.resultSuccess(allBase);
+        }else{
+            return resultUniteServiceImp.resultSuccess(allBase);
+        }
 
-
-
-
-         return resultUniteServiceImp.resultSuccess(allBase);
     }
 }
