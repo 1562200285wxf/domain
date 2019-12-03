@@ -6,6 +6,7 @@
         <result property="domId" column="domid"/>
         <result property="resTypeId" column="restypeid"/>
         <result property="opId" column="opid"/>
+        <result property="opName" column="opname"/>
         <result property="opDes" column="opdes"/>
         <result property="isExtend" column="isextend"/>
         <result property="isCommon" column="iscommon"/>
@@ -13,12 +14,12 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        id, domid, restypeid, opid, opdes, isExtend, isCommon, status
+        id, domid, restypeid, opid, opname, opdes, isExtend, isCommon, status
     </sql>
 
     <insert id="insert" parameterType="cn.itsmith.sysutils.resacl.entities.DomResOperation" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO t_dom_res_operation (domid, restypeid, opid, isExtend, isCommon, status)
-            VALUES (#{domId}, #{resTypeId}, #{opId}, #{isExtend}, #{isCommon}, #{status})
+        INSERT INTO t_dom_res_operation (domid, restypeid, opid, opname, opdes, isextend, iscommon, status)
+            VALUES (#{domId}, #{resTypeId}, #{opId}, #{opName}, #{opDes}, #{isExtend}, #{isCommon}, #{status})
     </insert>
 
     <delete id="delete" parameterType="cn.itsmith.sysutils.resacl.entities.DomResOperation">
