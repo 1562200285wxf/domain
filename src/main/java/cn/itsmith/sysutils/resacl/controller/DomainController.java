@@ -2,6 +2,7 @@ package cn.itsmith.sysutils.resacl.controller;
 
 import cn.itsmith.sysutils.resacl.common.config.ResponseInfo;
 import cn.itsmith.sysutils.resacl.common.exception.FailedException;
+import cn.itsmith.sysutils.resacl.common.utilss.EncryptUtil;
 import cn.itsmith.sysutils.resacl.common.utilss.TokenUtil;
 import cn.itsmith.sysutils.resacl.common.utilss.UpdateDomainDes;
 import cn.itsmith.sysutils.resacl.common.utilss.addDomain;
@@ -174,6 +175,12 @@ public class DomainController {
     public ResultUtils getAllDomain(){
         ResultUtils resultUtils = new ResultUtils();
         List<Domain> list = domainMapper.getAllDomain();
+        //遍历list 替换加密
+        for(Domain domain:
+                list
+        ){
+            domain.setDomToken(EncryptUtil.enCryptAndEncode(domain.getDomToken()));
+        }
         if(list == null){
             resultUtils.setCode(ResponseInfo.FALSE_IS.getErrorCode());
             resultUtils.setMessage("没有数据");

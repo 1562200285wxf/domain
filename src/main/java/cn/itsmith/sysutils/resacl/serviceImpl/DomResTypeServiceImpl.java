@@ -5,18 +5,23 @@ import cn.itsmith.sysutils.resacl.common.exception.FailedException;
 import cn.itsmith.sysutils.resacl.dao.DomOwnerResMapper;
 import cn.itsmith.sysutils.resacl.dao.DomResTypeMapper;
 import cn.itsmith.sysutils.resacl.entities.DomResType;
+import cn.itsmith.sysutils.resacl.entities.DomResTypeNode;
 import cn.itsmith.sysutils.resacl.service.DomResTypeService;
 import cn.itsmith.sysutils.resacl.service.DomainService;
 import cn.itsmith.sysutils.resacl.utils.ResultUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service(value = "DomResTypeService")
 public class DomResTypeServiceImpl implements DomResTypeService {
     @Autowired
     DomResTypeMapper domResTypeMapper;
+
+    @Autowired
+    DomResTypeServiceImpl domResTypeService;
 
     /**
      *判断资源种类是否存在
@@ -27,13 +32,13 @@ public class DomResTypeServiceImpl implements DomResTypeService {
     @Override
     public boolean domResTypeExist(int domId, int resTypeId) {
 
-        DomResType domResType = domResTypeMapper.selectById(domId, resTypeId);
+        DomResType domResType = domResTypeMapper.getDomResTypeByResTypeId(domId, resTypeId);
 //        if(domResType == null){
 //            throw new FailedException(ResponseInfo.GETRESTYPE_ERROR.getErrorCode(),
 //                    String.format("域标识为%d的域下不存在标识为%d的资源种类",
 //                            domId, resTypeId));
 //        }else{
-        if(domResType==null || domResType.getStatus()==0)
+        if(domResType==null)
             return false;
         else
             return true;
@@ -156,19 +161,65 @@ public class DomResTypeServiceImpl implements DomResTypeService {
         return resultUtils;
     }
 
-    public ResultUtils getDomResTypes(Integer domid){
+    public ResultUtils getDomResTree(Integer domid,Integer resTypeId){
         ResultUtils resultUtils = new ResultUtils();
         boolean type = domainService.isDomain(domid);
         if(!type){
             throw new FailedException(ResponseInfo.DOMAIN_NOT.getErrorCode(),"域"+domid+ ResponseInfo.DOMAIN_NOT.getErrorMsg());
         }
-        List<DomResType> list = domResTypeMapper.getDomResTypes(domid);
+        if(resTypeId==0){
+            DomResType DomResTypeRoot = new DomResType();
+            DomResTypeRoot.setResTypeId(0);
+            DomResTypeRoot.setPId(0);
+            DomResTypeRoot.setDomId(domid);
+            DomResTypeNode domResTypeNode = new DomResTypeNode(DomResTypeRoot);
+            DomResTypeNode  domResTypeTree =domResTypeService.createDomResTypeTree(domResTypeNode);
+            resultUtils.setCode(ResponseInfo.SUCCESS.getErrorCode());
+            resultUtils.setMessage(String.format(
+                    "成功获取标识为%d的域下所有属主树", domid));
+            resultUtils.setData(domResTypeTree);
+            return resultUtils;
+        }
+        //创建初始根节点
+        DomResType DomResTypeRoot = new DomResType();
+        DomResTypeRoot.setResTypeId(0);
+        DomResTypeRoot.setPId(0);
+        DomResTypeRoot.setDomId(domid);
+        DomResTypeNode domResTypeNode = new DomResTypeNode(DomResTypeRoot);
+        DomResTypeNode  domResTypeTree =domResTypeService.createDomResTypeTree(domResTypeNode);
+
         resultUtils.setCode(ResponseInfo.SUCCESS_IS.getErrorCode());
-        resultUtils.setMessage(String.format("域标识为%d的所有种类，删除成功",domid));
-        resultUtils.setData(list);
+        resultUtils.setMessage(String.format("域标识为%d的所有种类，获取成功",domid));
+        resultUtils.setData(domResTypeTree);
         return resultUtils;
     }
     public List<DomResType>   getDomResType(Integer domid){
         return domResTypeMapper.getDomResTypes(domid);
     }
+
+
+    /**
+     * 递归函数，传入树节点生成一个树，返回树的头节点
+     * @return
+     */
+    public DomResTypeNode createDomResTypeTree(DomResTypeNode domResTypeNode) {
+        int domId = domResTypeNode.getData().getDomId();
+        int resTypeId = domResTypeNode.getData().getResTypeId();
+        //找到子节点的资源属主
+        List<DomResType> child = domResTypeMapper.getDomResTypesByPid(domId,resTypeId);
+        //将子节点加入节点中
+        for(DomResType domResType : child){
+            DomResTypeNode domResTypeNode1 = new DomResTypeNode(domResType);
+            domResTypeNode.getChildList().add(domResTypeNode1);
+        }
+        //递归遍历子节点，让每个子节点递归生成子树
+        for(DomResTypeNode domResTypeNode1 : domResTypeNode.getChildList()){
+            if(domResTypeNode1.getData() != null){
+                createDomResTypeTree(domResTypeNode1);
+            }
+        }
+        return domResTypeNode;
+    }
+
+
 }

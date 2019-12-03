@@ -19,7 +19,8 @@
         select
         <include refid="Base_Column_List"/>
         from t_dom_res_type
-        where domid=#{domId, jdbcType=INTEGER} and restypeid=#{resTypeId, jdbcType=INTEGER}
+        where domid=#{domId, jdbcType=INTEGER}
+         and restypeid=#{resTypeId, jdbcType=INTEGER}
     </select>
 
     <select id="selectByOwnerId" resultMap="DomResType" parameterType="int">
@@ -92,12 +93,30 @@
         and status = #{1,jdbcType=INTEGER}
     </select>
 
+    <select id="getDomResTypeByResTypeId" resultMap="DomResType" parameterType="java.lang.Integer" >
+        select
+        <include refid="Base_Column_List" />
+        from t_dom_res_type
+        where restypeid = #{resTypeId,jdbcType=INTEGER}
+        and domid = #{domid,jdbcType=INTEGER}
+        and status = 1
+    </select>
+
+    <select id="getDomResTypesByPid" resultMap="DomResType" parameterType="java.lang.Integer" >
+        select
+        <include refid="Base_Column_List" />
+        from t_dom_res_type
+        where pid = #{pId,jdbcType=INTEGER}
+        and domid = #{domid,jdbcType=INTEGER}
+        and status = 1
+    </select>
+
     <select id="getDomResTypes" resultMap="DomResType" parameterType="java.lang.Integer" >
         select
         <include refid="Base_Column_List" />
         from t_dom_res_type
         where domid = #{domid,jdbcType=INTEGER}
-        and status = #{1,jdbcType=INTEGER}
+        and status = 1
     </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >

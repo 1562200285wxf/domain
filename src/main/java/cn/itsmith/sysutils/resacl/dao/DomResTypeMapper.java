@@ -55,4 +55,8 @@ public int addOwnerRes(DomOwnerRes domOwnerRes);
 
     //自己写的
     List<DomResType> getDomResTypes(Integer domid);
+
+    DomResType getDomResTypeByResTypeId(Integer domid,Integer resTypeId);
+
+    List<DomResType> getDomResTypesByPid(Integer domid,Integer pId);
 }

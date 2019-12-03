@@ -13,5 +13,5 @@ public interface DomResTypeService {
     public ResultUtils addResourceType(DomResType domResType);
     public ResultUtils changeResourceTypeDes(DomResType domResType);
     public ResultUtils deleteResourceType(DomResType domResType);
-    public ResultUtils getDomResTypes(Integer domid);
+    public ResultUtils getDomResTree(Integer domid,Integer resTypeId);
 }

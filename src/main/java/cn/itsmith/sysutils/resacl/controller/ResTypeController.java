@@ -5,6 +5,7 @@ package cn.itsmith.sysutils.resacl.controller;
 
 import cn.itsmith.sysutils.resacl.common.utilss.ChangeResourceTypeDes;
 import cn.itsmith.sysutils.resacl.common.utilss.DeleteResourceType;
+import cn.itsmith.sysutils.resacl.common.utilss.DomResTree;
 import cn.itsmith.sysutils.resacl.entities.DomResType;
 import cn.itsmith.sysutils.resacl.serviceImpl.DomResTypeServiceImpl;
 import cn.itsmith.sysutils.resacl.utils.ResultUtils;
@@ -70,10 +71,10 @@ public class ResTypeController {
 
     @ApiOperation(value = "查询域内资源种类")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "domid", value = "域id", dataType = "Integer",required = false,paramType = "query"),
+            @ApiImplicitParam(name = "domResTree", value = "域id", dataType = "DomResTree",required = false,paramType = "body"),
     })
-    @RequestMapping(value="/getDomResTypes",method = RequestMethod.GET)
-    public ResultUtils getDomResTypes(Integer domid){
-        return resTypeServiceImpl.getDomResTypes(domid);
+    @RequestMapping(value="/getDomResTree",method = RequestMethod.POST)
+    public ResultUtils getDomResTree( @RequestBody DomResTree domResTree){
+        return resTypeServiceImpl.getDomResTree(domResTree.getDomid(),domResTree.getResTypeId());
     }
 }
