@@ -6,6 +6,7 @@ import cn.itsmith.sysutils.resacl.dao.DomOwnerUserMapper;
 import cn.itsmith.sysutils.resacl.dao.DomResOwnerMapper;
 import cn.itsmith.sysutils.resacl.dao.DomUserOperationMapper;
 import cn.itsmith.sysutils.resacl.entities.DomOwnerUser;
+import cn.itsmith.sysutils.resacl.entities.DomOwnerUserA;
 import cn.itsmith.sysutils.resacl.entities.DomUserOperation;
 import cn.itsmith.sysutils.resacl.entities.User;
 import cn.itsmith.sysutils.resacl.service.DomResOwnerService;
@@ -233,6 +234,21 @@ public class UserServiceImp implements UserService {
         }else{
             return resultUniteServiceImp.resultSuccess(allBase);
         }
+
+    }
+
+    @Override
+    public ResultUtils addUsersFromBase(List<DomOwnerUser> domOwnerUsers) {
+        if(domOwnerUsers.size()!=0){
+            Iterator<DomOwnerUser> it = domOwnerUsers.iterator();
+            while(it.hasNext()){
+                this.addUser(it.next());
+            }
+            return resultUniteServiceImp.resultSuccess(domOwnerUsers);
+        }else{
+            return resultUniteServiceImp.resultSuccess("请选择成员去添加");
+        }
+
 
     }
 }

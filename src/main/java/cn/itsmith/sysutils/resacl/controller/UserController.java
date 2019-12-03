@@ -13,9 +13,12 @@ import cn.itsmith.sysutils.resacl.serviceImpl.DomOwnerUserServiceImpl;
 import cn.itsmith.sysutils.resacl.utils.ResultUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 @Api(value="成员Controller",tags={"属主拥有成员Api"})
@@ -185,6 +188,13 @@ public ResultUtils queryUserTree(@RequestParam(value="domId",required = true) In
 
     }
 
+    /**
+     * 下面的几个接口判断属主是否存在就在controller里直接判了，省事
+     * @param domId
+     * @param ownerId
+     * @param validate
+     * @return
+     */
     @ApiOperation(value = "查询特定属主下的成员们", notes = "针对属主成员的查询操作")
     @RequestMapping(value="/queryusers/{domId}",method = RequestMethod.GET)
     public ResultUtils queryUsers(@PathVariable Integer domId,
@@ -210,7 +220,37 @@ public ResultUtils queryUserTree(@RequestParam(value="domId",required = true) In
     }
 
 
+    @ApiOperation(value = "成员添加,从base表中复选多条成员", notes = "针对属主成员的添加操作")
+    @RequestMapping(value="/addusersfromBase",method = RequestMethod.POST)
+    public ResultUtils addUsersFromBase(@RequestBody List<DomOwnerUserA> domOwnerUserAS, @RequestHeader(value = "token", required = true) String validate){
+        List<DomOwnerUser> domOwnerUsers = new ArrayList<DomOwnerUser>();
+        Iterator<DomOwnerUserA> it = domOwnerUserAS.iterator();
+        int i=0;
+            while(it.hasNext()){
+                DomOwnerUserA next = it.next();
+                DomOwnerUser domOwnerUser = new DomOwnerUser();
+                domOwnerUser.setDomId(next.getDomId());
+                domOwnerUser.setOwnerId(next.getOwnerId());
+                domOwnerUser.setUserId(next.getUserId());
+                domOwnerUsers.add(domOwnerUser);
+            }
+//判断一个就行了，前台规定是【当前域】的【当前属主】下
+        Integer domId=domOwnerUserAS.get(0).getDomId();
+        Integer ownerId = domOwnerUserAS.get(0).getOwnerId();
+        Integer varifycode  = domainMapper.varify(domId,validate);
+        if(varifycode!=1){
+            throw new FailedException(ResponseInfo.AUTH_FAILED.getErrorCode(),
+                    "不能将用户"+domOwnerUserAS.get(0).getUserId()+"加入到域"+domOwnerUserAS.get(0).getDomId()+
+                            "下，因为"+ResponseInfo.AUTH_FAILED.getErrorMsg());
+        }else if(!(domResOwnerService1.ownerExist(domId,ownerId))){
+            throw new FailedException(ResponseInfo.OWNER_FAILED.getErrorCode(),
+                    "查询失败，因为域"+domId+"下的属主"+ownerId+"不存在"
+            );
+        }else{
+            return userService.addUsersFromBase(domOwnerUsers);
+        }
 
+    }
 
 
 
