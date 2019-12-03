@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/domResOperation")
 @Api(tags = "资源可用权限的基础类api文档")
 public class DomResOperationController {
     @Autowired
@@ -43,7 +42,7 @@ public class DomResOperationController {
             @ApiImplicitParam(name = "Auth", value = "域令牌", required = false, dataType = "String", paramType = "header"),
             @ApiImplicitParam(name = "domResOperationA", value = "资源可用权限", required = true, dataType = "DomResOperationA", paramType = "body")
     })
-    @PostMapping("/addDomResOperation")
+    @PostMapping("/operation")
     public ResultUtils addDomResOperation(@RequestHeader(value = "Auth", required = true) String Auth, @RequestBody DomResOperationA domResOperationA) {
         //根据令牌和domain判断请求请求是否正确
         domainService.verify(domResOperationA.getDomId(), Auth);
@@ -87,7 +86,7 @@ public class DomResOperationController {
             @ApiImplicitParam(name = "Auth", value = "域令牌", required = false, dataType = "String", paramType = "header"),
             @ApiImplicitParam(name = "domResOperationD", value = "资源可用权限", required = true, dataType = "DomResOperationD", paramType = "body")
     })
-    @DeleteMapping("/deleteDomResOperation")
+    @DeleteMapping("/operation")
     public ResultUtils deleteDomResOwner(@RequestHeader(value = "Auth", required = true) String Auth, @RequestBody DomResOperationD domResOperationD){
         //根据令牌和domain判断请求请求是否正确
         domainService.verify(domResOperationD.getDomId(), Auth);
@@ -129,7 +128,7 @@ public class DomResOperationController {
             @ApiImplicitParam(name = "domId", value = "域标识", required = true, dataType = "int", paramType = "path"),
             @ApiImplicitParam(name = "resTypeId", value = "资源类型标识", required = true, dataType = "int", paramType = "query"),
     })
-    @GetMapping("/getDomResOperation/{domId}")
+    @GetMapping("/operations/{domId}")
     public ResultUtils getDomResOperation(@RequestHeader(value = "Auth", required = true) String Auth, @PathVariable(value = "domId") int domId, @RequestParam(value = "resTypeId") int resTypeId) {
         //根据令牌和domain判断请求请求是否正确
         domainService.verify(domId, Auth);
@@ -158,8 +157,8 @@ public class DomResOperationController {
             @ApiImplicitParam(name = "Auth", value = "域令牌", required = false, dataType = "String", paramType = "header"),
             @ApiImplicitParam(name = "domResOperationU", value = "域资源属主", required = true, dataType = "DomResOperationU", paramType = "body")
     })
-    @PostMapping("/modifyOwnerDes")
-    public ResultUtils modifyOwnerDes(@RequestHeader(value = "Auth", required = true) String Auth, @RequestBody DomResOperationU domResOperationU) {
+    @PutMapping("/operation-des")
+    public ResultUtils modifyOpDes(@RequestHeader(value = "Auth", required = true) String Auth, @RequestBody DomResOperationU domResOperationU) {
         //根据令牌和domain判断请求请求是否正确
         domainService.verify(domResOperationU.getDomId(), Auth);
         if(!domResOperationService.resOperationExist(domResOperationU.getDomId(),
@@ -191,7 +190,7 @@ public class DomResOperationController {
             @ApiImplicitParam(name = "Auth", value = "域令牌", required = false, dataType = "String", paramType = "header"),
             @ApiImplicitParam(name = "domResOperationD", value = "域资源属主", required = true, dataType = "DomResOperationD", paramType = "body")
     })
-    @PostMapping("/setExtend")
+    @PutMapping("/extend")
     public ResultUtils setExtend(@RequestHeader(value = "Auth", required = true) String Auth, @RequestBody DomResOperationD domResOperationD) {
         //根据令牌和domain判断请求请求是否正确
         domainService.verify(domResOperationD.getDomId(), Auth);
@@ -223,7 +222,7 @@ public class DomResOperationController {
             @ApiImplicitParam(name = "Auth", value = "域令牌", required = false, dataType = "String", paramType = "header"),
             @ApiImplicitParam(name = "domResOperationD", value = "域资源属主", required = true, dataType = "DomResOperationD", paramType = "body")
     })
-    @PostMapping("/cancelExtend")
+    @PutMapping("/not-extend")
     public ResultUtils cancelExtend(@RequestHeader(value = "Auth", required = true) String Auth, @RequestBody DomResOperationD domResOperationD) {
         //根据令牌和domain判断请求请求是否正确
         domainService.verify(domResOperationD.getDomId(), Auth);
@@ -255,7 +254,7 @@ public class DomResOperationController {
             @ApiImplicitParam(name = "Auth", value = "域令牌", required = false, dataType = "String", paramType = "header"),
             @ApiImplicitParam(name = "domResOperationD", value = "域资源属主", required = true, dataType = "DomResOperationD", paramType = "body")
     })
-    @PostMapping("/setCommon")
+    @PutMapping("/common")
     public ResultUtils setCommon(@RequestHeader(value = "Auth", required = true) String Auth, @RequestBody DomResOperationD domResOperationD) {
         //根据令牌和domain判断请求请求是否正确
         domainService.verify(domResOperationD.getDomId(), Auth);
@@ -287,7 +286,7 @@ public class DomResOperationController {
             @ApiImplicitParam(name = "Auth", value = "域令牌", required = false, dataType = "String", paramType = "header"),
             @ApiImplicitParam(name = "domResOperationD", value = "域资源属主", required = true, dataType = "DomResOperationD", paramType = "body")
     })
-    @PostMapping("/cancelCommon")
+    @PutMapping("/not-common")
     public ResultUtils cancelCommon(@RequestHeader(value = "Auth", required = true) String Auth, @RequestBody DomResOperationD domResOperationD) {
         //根据令牌和domain判断请求请求是否正确
         domainService.verify(domResOperationD.getDomId(), Auth);
