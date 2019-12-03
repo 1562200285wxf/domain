@@ -13,7 +13,8 @@ public interface DomResInstanceMapper {
     int delete(DomResInstance domResInstance);
     int updateStatus(DomResInstance domResInstance);
     DomResInstance select(DomResInstance domResInstance);
-    List<DomResInstance> selectByOwnerId(int ownerId);
+    List<DomResInstance> selectByOwnerId(@Param("domId") int domId,
+                                         @Param("ownerId") int ownerId);
 //liu
     //判断该域下，类型是否正在被属主使用【属主拥有资源】
     public List<DomResInstance> beingUsed(@Param("domId") Integer domId,

@@ -5,10 +5,7 @@ import cn.itsmith.sysutils.resacl.common.exception.FailedException;
 import cn.itsmith.sysutils.resacl.dao.DomResInstanceMapper;
 import cn.itsmith.sysutils.resacl.dao.DomResOwnerMapper;
 import cn.itsmith.sysutils.resacl.dao.DomUserOperationMapper;
-import cn.itsmith.sysutils.resacl.entities.DomResInstance;
-import cn.itsmith.sysutils.resacl.entities.DomResOwner;
-import cn.itsmith.sysutils.resacl.entities.DomResOwnerNode;
-import cn.itsmith.sysutils.resacl.entities.DomUserOperation;
+import cn.itsmith.sysutils.resacl.entities.*;
 import cn.itsmith.sysutils.resacl.service.DomResInstanceService;
 import cn.itsmith.sysutils.resacl.service.DomResOwnerService;
 import cn.itsmith.sysutils.resacl.utils.ResultUtils;
@@ -16,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 @Service(value = "DomResInstanceService")
@@ -89,7 +87,7 @@ public class DomResInstanceServiceImpl implements DomResInstanceService {
      * @return
      */
     @Override
-    public ResultUtils getOwnerResInstance(int domId, int ownerId) {
+    public ResultUtils getOwnerTreeResInstance(int domId, int ownerId) {
         DomResOwner domResOwner = domResOwnerMapper.selectById(domId, ownerId);
         //生成头节点
         DomResOwnerNode domResOwnerNode1 = new DomResOwnerNode(domResOwner);
@@ -101,7 +99,7 @@ public class DomResInstanceServiceImpl implements DomResInstanceService {
         List<DomResInstance> domResInstances = new ArrayList<DomResInstance>();
         //遍历属主和子属主查到他们的资源实例，加入到需要查找的属主的资源实例中
         for(DomResOwner domResOwner1 : domResOwners){
-            List<DomResInstance> domResInstances1 = domResInstanceMapper.selectByOwnerId(domResOwner1.getOwnerId());
+            List<DomResInstance> domResInstances1 = domResInstanceMapper.selectByOwnerId(domResOwner1.getDomId(), domResOwner1.getOwnerId());
             for(DomResInstance domResInstance : domResInstances1)
                 if(domResInstance.getStatus()==1)
                     domResInstances.add(domResInstance);
@@ -110,6 +108,52 @@ public class DomResInstanceServiceImpl implements DomResInstanceService {
                 String.format("成功获取标识为%d的域下标识为%d的属主的资源实例",
                         domId, ownerId), domResInstances);
 
+        return resultUtils;
+    }
+
+    /**
+     * 获取属主下所有资源实例
+     * @param domId
+     * @param ownerId
+     * @return
+     */
+    @Override
+    public ResultUtils getOwnerInstance(int domId, int ownerId) {
+        List<DomResInstance> domResInstances = domResInstanceMapper.selectByOwnerId(domId, ownerId);
+        Iterator<DomResInstance> domResInstancesIt = domResInstances.iterator();
+        while (domResInstancesIt.hasNext()) {
+            DomResInstance domResInstance = domResInstancesIt.next();
+            if (domResInstance.getStatus() == 0) {
+                domResInstancesIt.remove();
+            }
+        }
+        ResultUtils resultUtils = new ResultUtils(ResponseInfo.SUCCESS.getErrorCode(),
+                String.format("成功获取标识为%d的域下标识为%d的属主的资源实例",
+                        domId, ownerId), domResInstances);
+
+        return resultUtils;
+    }
+
+    /**
+     * 获取资源属主下某个种类下的资源实例
+     * @param domId
+     * @param ownerId
+     * @param resTypeId
+     * @return
+     */
+    @Override
+    public ResultUtils getOwnerRTypeInstance(int domId, int ownerId, int resTypeId) {
+        List<DomResInstance> domResInstances = domResInstanceMapper.beingUsed(domId, ownerId, resTypeId);
+        Iterator<DomResInstance> domResInstancesIt = domResInstances.iterator();
+        while (domResInstancesIt.hasNext()) {
+            DomResInstance domResInstance = domResInstancesIt.next();
+            if (domResInstance.getStatus() == 0) {
+                domResInstancesIt.remove();
+            }
+        }
+        ResultUtils resultUtils = new ResultUtils(ResponseInfo.SUCCESS.getErrorCode(),
+                String.format("成功获取标识为%d的域下标识为%d的属主下标识为%d的种类的资源实例",
+                        domId, ownerId, resTypeId), domResInstances);
         return resultUtils;
     }
 

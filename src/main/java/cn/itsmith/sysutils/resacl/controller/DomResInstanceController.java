@@ -189,7 +189,48 @@ public class DomResInstanceController {
                     String.format("不存在域标识为%d的域下不存在标识为%d的属主,查找失败",
                             domId, ownerId));
 
-        return domResInstanceService.getOwnerResInstance(domId, ownerId);
+        return domResInstanceService.getOwnerInstance(domId, ownerId);
+    }
+
+    @ApiOperation(value = "获取属主资源实例",
+            notes = "获取属主资源实例  \n" +
+                    "逻辑：在请求头中传入域令牌，在请求体中传入域标识、资源属主标识，资源种类标识，首先根据域标识和域令牌判断是否授权；" +
+                    "根据属主标识查找是否存在该属主,存在则继续执行，不存在抛出错误；" +
+                    "查找实例：通过域标识和属主标识查找到该属主，通过查找属主树上的所有属主，将属主树上所有属主的资源实例加到需要查找的属主中" +
+                    "成功添加后返回成功码，以及获取的属主资源实例。  \n" +
+                    "成功码：  \n" +
+                    "  200：成功获取标识为XXX的域下标识为XXX的属主的资源实例  \n" +
+                    "错误码：  \n" +
+                    "   1001：域或域令牌错误  \n" +
+                    "   2002：添加的实例中域标识为XXX的域下不存在标识为XXX的属主,添加失败  \n" +
+                    "   8000：未知错误，查找失败  \n")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "Auth", value = "域令牌", required = false, dataType = "String", paramType = "header"),
+            @ApiImplicitParam(name = "domResInstanceG", value = "属主资源实例", required = true, dataType = "DomResInstanceG", paramType = "body")
+    })
+    @PostMapping("/getOwnerRTypeInstance")
+    public ResultUtils getOwnerRTypeInstance(@RequestHeader(value = "Auth", required = true) String Auth, @RequestBody DomResInstanceG domResInstanceG) {
+        //根据令牌和domain判断请求请求是否正确
+        domainService.verify(domResInstanceG.getDomId(), Auth);
+        //根据属主标识查找是否存在该属主
+        if(!domResOwnerService.ownerExist(domResInstanceG.getDomId(), domResInstanceG.getOwnerId()))
+            throw new FailedException(ResponseInfo.GETOWNER_ERROR.getErrorCode(),
+                    String.format("不存在域标识为%d的域下不存在标识为%d的属主,查找失败",
+                            domResInstanceG.getDomId(), domResInstanceG.getOwnerId()));
+//根据资源种类标识查找是否存在该资源种类
+        if(!domResTypeService.domResTypeExist(domResInstanceG.getDomId(),
+                domResInstanceG.getResTypeId()))
+            throw new FailedException(ResponseInfo.GETRESTYPE_ERROR.getErrorCode(),
+                    String.format("添加的实例中域标识为%d的域下标识为%d的资源种类不存在,删除失败",
+                            domResInstanceG.getDomId(), domResInstanceG.getResTypeId()));
+
+        //根据域id，属主id和资源类型id查找此属主是否拥有该资源种类
+        if(!domOwnerResService.ownerResExist(domResInstanceG.getDomId(),
+                domResInstanceG.getOwnerId(), domResInstanceG.getResTypeId()))
+            throw new FailedException(ResponseInfo.GETRESTYPE_ERROR.getErrorCode(),
+                    String.format("删除的实例中域标识为%d的域下标识为%d的资源属主不存在标识为%d的资源种类,删除失败",
+                            domResInstanceG.getDomId(), domResInstanceG.getOwnerId(), domResInstanceG.getResTypeId()));
+        return domResInstanceService.getOwnerRTypeInstance(domResInstanceG.getDomId(), domResInstanceG.getOwnerId(), domResInstanceG.getResTypeId());
     }
 
 }

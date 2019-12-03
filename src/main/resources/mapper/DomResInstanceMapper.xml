@@ -17,11 +17,11 @@
     </sql>
 
     <!--根据资源属主标识查询资源实例-->
-    <select id="selectByOwnerId" resultMap="DomResInstance" parameterType="int">
+    <select id="selectByOwnerId" resultMap="DomResInstance">
         select
         <include refid="Base_Column_List"/>
         from t_dom_res_instance
-        where ownerid = #{ownerId}
+        where domid=#{domId, jdbcType=INTEGER} and ownerid=#{ownerId, jdbcType=INTEGER}
     </select>
 
     <select id="select" resultMap="DomResInstance" parameterType="cn.itsmith.sysutils.resacl.entities.DomResInstance">
