@@ -251,4 +251,31 @@ public class UserServiceImp implements UserService {
 
 
     }
+
+    @Override
+    public ResultUtils queryOtherUsers(DomOwnerUser domOwnerUser) {
+        //where ownerid!=#{ownerId}
+        List<DomOwnerUser> otherUsers = userMapper.getOtherUsers(domOwnerUser.getDomId(),domOwnerUser.getOwnerId());
+        //这个查询的是当前属主拥有的成员
+        List<DomOwnerUser> allDomUsers = userMapper.queryUserBydomowner(domOwnerUser.getDomId(), domOwnerUser.getOwnerId());
+        if(allDomUsers.size()!=0){
+            //待删的集合一定要用迭代器，不然报错
+            Iterator<DomOwnerUser> it = otherUsers.iterator();
+            while(it.hasNext()) {
+                DomOwnerUser otherUser = it.next();
+                String userName = userMapper.queryUserName(otherUser.getUserId());
+                otherUser.setUserName(userName);
+                for (DomOwnerUser domOwnerUser1:
+                        allDomUsers) {
+                    if(otherUser.getUserId().equals(domOwnerUser1.getUserId())){
+                        it.remove();
+                        break;
+                    }
+                }
+            }
+            return resultUniteServiceImp.resultSuccess(otherUsers);
+        }else{
+            return resultUniteServiceImp.resultSuccess(otherUsers);
+        }
+    }
 }

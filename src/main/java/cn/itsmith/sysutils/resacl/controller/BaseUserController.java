@@ -42,7 +42,7 @@ public class BaseUserController {
 
         if(varifycode!=1){
             throw new FailedException(ResponseInfo.AUTH_FAILED.getErrorCode(),
-                    "不能查询域"+domId+"下的属主"+ownerId+"拥有的成员树，因为"+
+                    "查询特定属主下不存在的基本成员们,失败，"+
                             ResponseInfo.AUTH_FAILED.getErrorMsg());
         }else if(!(domResOwnerService1.ownerExist(domId,ownerId))){
             throw new FailedException(ResponseInfo.OWNER_FAILED.getErrorCode(),

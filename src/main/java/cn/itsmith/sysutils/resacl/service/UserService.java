@@ -15,9 +15,21 @@ public interface UserService {
     ResultUtils concelAdmin(DomOwnerUser domOwnerUser);
     //查询在特定属主下的domUsers
     ResultUtils queryUsers(DomOwnerUser domOwnerUser);
+
+    /**
+     * 用户添加模块1
+     *
+     */
     //查询特定属主下不存在的基本Users
     ResultUtils queryBaseUsers(DomOwnerUser domOwnerUser);
     //添加基本UserList
     ResultUtils addUsersFromBase(List<DomOwnerUser> domOwnerUsers);
+    /**
+     * 用户添加模块2
+     *
+     */
+    //查询其他属主下的所有成员，且本属主下不存在的成员
+    ResultUtils queryOtherUsers(DomOwnerUser domOwnerUser);
+
 
 }

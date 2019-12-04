@@ -43,6 +43,8 @@ public interface DomOwnerUserMapper {
     public String queryUserName(Integer userId);
     //查询所有基本表select *
     public List<User> getAllBase();
+    //查询逻辑表中本域下其他机构的所有成员
+    public List<DomOwnerUser> getOtherUsers(@Param("domId") Integer domId,@Param("ownerId") Integer ownerId);
     //级联删除user
     public int deleteUserCascading(String id);
 

@@ -219,7 +219,12 @@ public ResultUtils queryUserTree(@RequestParam(value="domId",required = true) In
         }
     }
 
-
+    /**
+     * 成员添加模块1,查询写在BaseUserController里了，而下面的添加通用，添加模块2也通用
+     * @param domOwnerUserAS
+     * @param validate
+     * @return
+     */
     @ApiOperation(value = "成员添加,从base表中复选多条成员", notes = "针对属主成员的添加操作")
     @RequestMapping(value="/addusersfromBase",method = RequestMethod.POST)
     public ResultUtils addUsersFromBase(@RequestBody List<DomOwnerUserA> domOwnerUserAS, @RequestHeader(value = "token", required = true) String validate){
@@ -252,6 +257,36 @@ public ResultUtils queryUserTree(@RequestParam(value="domId",required = true) In
 
     }
 
+    /**
+     * 添加成员模块2
+     * @param domId
+     * @param ownerId
+     * @param validate
+     * @return
+     */
+    @ApiOperation(value = "查询其他机构下的成员们，且当前属主下不存在的成员们", notes = "针对属主成员的查询操作")
+    @RequestMapping(value="/queryotherusers/{domId}",method = RequestMethod.GET)
+    public ResultUtils queryOtherUsers(@PathVariable Integer domId,
+                                  @RequestParam(value="ownerId",required = true) Integer ownerId,
+                                  @RequestHeader(value = "Validate", required = true) String validate) {
+
+        Integer varifycode  = domainMapper.varify(domId,validate);
+        DomOwnerUser domOwnerUser = new DomOwnerUser();
+        domOwnerUser.setDomId(domId);
+        domOwnerUser.setOwnerId(ownerId);
+
+        if(varifycode!=1){
+            throw new FailedException(ResponseInfo.AUTH_FAILED.getErrorCode(),
+                    "（查询其他机构下的成员们，且当前属主下不存在的成员们）失败，因为"+
+                            ResponseInfo.AUTH_FAILED.getErrorMsg());
+        }else if(!(domResOwnerService1.ownerExist(domId,ownerId))){
+            throw new FailedException(ResponseInfo.OWNER_FAILED.getErrorCode(),
+                    "查询失败，因为域"+domId+"下的属主"+ownerId+"不存在"
+            );
+        }else {
+            return userService.queryOtherUsers(domOwnerUser);
+        }
+    }
 
 
 }
