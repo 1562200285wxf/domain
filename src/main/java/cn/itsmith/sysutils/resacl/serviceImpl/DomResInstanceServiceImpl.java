@@ -5,6 +5,7 @@ import cn.itsmith.sysutils.resacl.common.exception.FailedException;
 import cn.itsmith.sysutils.resacl.dao.DomResInstanceMapper;
 import cn.itsmith.sysutils.resacl.dao.DomResOwnerMapper;
 import cn.itsmith.sysutils.resacl.dao.DomUserOperationMapper;
+import cn.itsmith.sysutils.resacl.dao.InstanceMapper;
 import cn.itsmith.sysutils.resacl.entities.*;
 import cn.itsmith.sysutils.resacl.service.DomResInstanceService;
 import cn.itsmith.sysutils.resacl.service.DomResOwnerService;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -25,6 +27,8 @@ public class DomResInstanceServiceImpl implements DomResInstanceService {
     DomUserOperationMapper domUserOperationMapper;
     @Autowired
     DomResOwnerMapper domResOwnerMapper;
+    @Autowired
+    InstanceMapper instanceMapper;
     @Autowired
     DomResOwnerService domResOwnerService;
 
@@ -45,6 +49,26 @@ public class DomResInstanceServiceImpl implements DomResInstanceService {
         }else {
             throw new FailedException("未知错误，数据插入失败");
         }
+        return resultUtils;
+    }
+
+    /**
+     * 添加多个实例
+     * @param domResInstances
+     * @return
+     */
+    @Override
+    public ResultUtils addDomResInstances(List<DomResInstance> domResInstances) {
+        ResultUtils resultUtils = new ResultUtils();
+        for(DomResInstance domResInstance : domResInstances){
+            domResInstance.setStatus(1);
+            domResInstanceMapper.insert(domResInstance);
+        }
+
+        resultUtils.setCode(ResponseInfo.SUCCESS.getErrorCode());
+        resultUtils.setMessage(String.format("成功为标识为%d的域下标识为%d的属主中标识为%d的资源种类添加%d个资源实例",
+                domResInstances.get(0).getDomId(), domResInstances.get(0).getOwnerId(), domResInstances.get(0).getResTypeId(), domResInstances.size()));
+        resultUtils.setData(domResInstances.size());
         return resultUtils;
     }
 
@@ -71,7 +95,7 @@ public class DomResInstanceServiceImpl implements DomResInstanceService {
         ResultUtils resultUtils = new ResultUtils();
         //删除属主资源实例
         domResInstance.setStatus(0);
-        if(domResInstanceMapper.updateStatus(domResInstance)==1){
+        if(domResInstanceMapper.updateStatus(domResInstance)!=0){
             resultUtils.setCode(ResponseInfo.SUCCESS.getErrorCode());
             resultUtils.setMessage(String.format("成功删除标识为%d的域下标识为%d的属主中标识为%d的资源种类中标识为%d的资源实例",
                     domResInstance.getDomId(), domResInstance.getOwnerId(), domResInstance.getResTypeId(), domResInstance.getResId()));
@@ -127,6 +151,7 @@ public class DomResInstanceServiceImpl implements DomResInstanceService {
                 domResInstancesIt.remove();
             }
         }
+
         ResultUtils resultUtils = new ResultUtils(ResponseInfo.SUCCESS.getErrorCode(),
                 String.format("成功获取标识为%d的域下标识为%d的属主的资源实例",
                         domId, ownerId), domResInstances);
@@ -151,9 +176,112 @@ public class DomResInstanceServiceImpl implements DomResInstanceService {
                 domResInstancesIt.remove();
             }
         }
+        DomResInstanceR domResInstanceR = new DomResInstanceR();
+        List<TableData> tableData = new ArrayList<TableData>();
+        //1代表桌子
+        if(resTypeId==1){
+            List<Desk> desks = instanceMapper.selectAllDesk();
+            List<Desk> desks1 = new ArrayList<Desk>();
+            for(Desk desk : desks) {
+                for (DomResInstance domResInstance : domResInstances) {
+                    if (domResInstance.getResId().equals(desk.getResId())) {
+                        desks1.add(desk);
+                    }
+                }
+            }
+
+            TableData tableData1 = new TableData("编号", "resId");
+            tableData.add(tableData1);
+            TableData tableData2 = new TableData("名称", "name");
+            tableData.add(tableData2);
+            TableData tableData3 = new TableData("描述", "description");
+            tableData.add(tableData3);
+            TableData tableData4 = new TableData("形状", "shape");
+            tableData.add(tableData4);
+            domResInstanceR.setTableData(tableData);
+            domResInstanceR.setDomResInstances(Collections.singletonList(desks1));
+        }
+        //2代表房间
+        if(resTypeId==2){
+            List<Room> rooms = instanceMapper.selectAllRoom();
+            List<Room> rooms1 = new ArrayList<Room>();;
+            for(Room room : rooms){
+                for(DomResInstance domResInstance : domResInstances){
+                    if(domResInstance.getResId().equals(room.getResId())){
+                        rooms1.add(room);
+                    }
+                }
+            }
+            TableData tableData1 = new TableData("编号", "resId");
+            tableData.add(tableData1);
+            TableData tableData2 = new TableData("名称", "name");
+            tableData.add(tableData2);
+            TableData tableData3 = new TableData("描述", "description");
+            tableData.add(tableData3);
+            TableData tableData4 = new TableData("拥有桌子数量", "deskNo");
+            tableData.add(tableData4);
+            TableData tableData5 = new TableData("可容纳人数", "volume");
+            tableData.add(tableData5);
+            domResInstanceR.setTableData(tableData);
+            domResInstanceR.setDomResInstances(Collections.singletonList(rooms1));
+        }
         ResultUtils resultUtils = new ResultUtils(ResponseInfo.SUCCESS.getErrorCode(),
                 String.format("成功获取标识为%d的域下标识为%d的属主下标识为%d的种类的资源实例",
-                        domId, ownerId, resTypeId), domResInstances);
+                        domId, ownerId, resTypeId), domResInstanceR);
+        return resultUtils;
+    }
+
+    /**
+     * 通过资源类型id到特定的资源表里面查找到，再把改属主已经拥有的剔除。
+     * @param domId
+     * @param ownerId
+     * @param resTypeId
+     * @return
+     */
+    @Override
+    public ResultUtils getBaseRTypeInstance(int domId, int ownerId, int resTypeId) {
+        List<DomResInstance> domResInstances = domResInstanceMapper.beingUsed(domId, ownerId, resTypeId);
+        Iterator<DomResInstance> domResInstancesIt = domResInstances.iterator();
+        while (domResInstancesIt.hasNext()) {
+            DomResInstance domResInstance = domResInstancesIt.next();
+            if (domResInstance.getStatus() == 0) {
+                domResInstancesIt.remove();
+            }
+        }
+        ResultUtils resultUtils = new ResultUtils();
+        if(resTypeId == 1){
+            List<Desk> desks = instanceMapper.selectAllDesk();
+            Iterator<Desk> desksIt = desks.iterator();
+            while (desksIt.hasNext()) {
+                Desk desk = desksIt.next();
+                for(DomResInstance domResInstance : domResInstances){
+                    if (desk.getResId().equals(domResInstance.getResId())) {
+                        desksIt.remove();
+                        break;
+                    }
+                }
+            }
+            resultUtils.setCode(ResponseInfo.SUCCESS.getErrorCode());
+            resultUtils.setData(desks);
+            resultUtils.setMessage("成功获取该资源种类下的资源实例");
+            return resultUtils;
+        }else if(resTypeId==2){
+            List<Room> rooms = instanceMapper.selectAllRoom();
+            Iterator<Room> roomsIt = rooms.iterator();
+            while (roomsIt.hasNext()) {
+                Room room = roomsIt.next();
+                for(DomResInstance domResInstance : domResInstances){
+                    if (room.getResId().equals(domResInstance.getResId())) {
+                        roomsIt.remove();
+                        break;
+                    }
+                }
+            }
+            resultUtils.setCode(ResponseInfo.SUCCESS.getErrorCode());
+            resultUtils.setData(rooms);
+            resultUtils.setMessage("成功获取该资源种类下的资源实例");
+            return resultUtils;
+        }
         return resultUtils;
     }
 

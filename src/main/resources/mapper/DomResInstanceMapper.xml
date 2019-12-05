@@ -9,11 +9,10 @@
         <result property="resTypeId" column="restypeid"/>
         <result property="resPid" column="respid"/>
         <result property="status" column="status"/>
-        <result property="insName" column="insname"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        id, domid, ownerid, resid, restypeid, respid, status, insname
+        id, domid, ownerid, resid, restypeid, respid, status
     </sql>
 
     <!--根据资源属主标识查询资源实例-->
@@ -28,12 +27,12 @@
         select
         <include refid="Base_Column_List"/>
         from t_dom_res_instance
-        where domid=#{domId} and ownerid=#{ownerId} and resid=#{resId} and restypeid=#{resTypeId}
+        where domid=#{domId} and ownerid=#{ownerId} and resid=#{resId} and restypeid=#{resTypeId} and status=1
     </select>
 
     <insert id="insert" parameterType="cn.itsmith.sysutils.resacl.entities.DomResInstance" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO t_dom_res_instance (domid, ownerid, restypeid, resid, ResPId, status, insname)
-            VALUES (#{domId}, #{ownerId}, #{resTypeId}, #{resId}, #{resPid}, #{status}, #{insName} )
+        INSERT INTO t_dom_res_instance (domid, ownerid, restypeid, resid, Respid, status)
+            VALUES (#{domId}, #{ownerId}, #{resTypeId}, #{resId}, #{resPid}, #{status} )
     </insert>
 
     <delete id="delete" >
@@ -47,7 +46,7 @@
         <set>
             status = #{status, jdbcType=INTEGER}
         </set>
-        where domid=#{domId, jdbcType=INTEGER} and ownerid=#{ownerId, jdbcType=INTEGER} and resid=#{resId, jdbcType=INTEGER}
+        where domid=#{domId, jdbcType=INTEGER} and ownerid=#{ownerId, jdbcType=INTEGER} and resid=#{resId, jdbcType=INTEGER} and restypeid=#{resTypeId, jdbcType=INTEGER}
     </update>
 
 <!--    liu-->
