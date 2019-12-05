@@ -8,8 +8,10 @@ import cn.itsmith.sysutils.resacl.dao.DomainMapper;
 import cn.itsmith.sysutils.resacl.entities.DomOwnerRes;
 import cn.itsmith.sysutils.resacl.entities.DomOwnerResA;
 import cn.itsmith.sysutils.resacl.service.DomOwnerResMaxService;
+import cn.itsmith.sysutils.resacl.service.DomOwnerResService;
 import cn.itsmith.sysutils.resacl.service.DomResOwnerService;
 import cn.itsmith.sysutils.resacl.service.ResService;
+import cn.itsmith.sysutils.resacl.serviceImpl.DomOwnerResServiceImpl;
 import cn.itsmith.sysutils.resacl.utils.ResultUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -164,7 +166,36 @@ ResService resService;
             throw new FailedException(ResponseInfo.OWNER_FAILED.getErrorCode(),
                     "查询失败，因为域"+domId+"下的属主"+ownerId+"不存在");
         }else{
-            return domOwnerResMaxService.getOwnerMaxRess(domId,ownerId);
+        return domOwnerResMaxService.getOwnerMaxRess(domId,ownerId);
+        }
+
+        }
+
+    /**
+     * select all
+     * @param domId
+     * @param ownerId
+     * @param validate
+     * @return
+     */
+    @Autowired
+    DomOwnerResService domOwnerResService2;
+    @ApiOperation(value = "查询资源种类树max", notes = "针对属主拥有的资源的查询操作")
+    @RequestMapping(value="/queryallrestype/{domId}",method = RequestMethod.GET)
+    public ResultUtils queryAllRes(@PathVariable(value="domId",required = true) Integer domId,
+                                       @RequestParam(value="ownerId",required = true) Integer ownerId,
+                                       @RequestHeader(value = "Validate", required = true) String validate){
+
+        Integer varifycode  = domainMapper.varify(domId,validate);
+        if(varifycode!=1){
+            throw new FailedException(ResponseInfo.AUTH_FAILED.getErrorCode(),
+                    "不能查询域"+domId+"下的属主"+ownerId+"拥有的资源种类，因为"+
+                            ResponseInfo.AUTH_FAILED.getErrorMsg());
+        }else if(!(domResOwnerService1.ownerExist(domId,ownerId))){
+            throw new FailedException(ResponseInfo.OWNER_FAILED.getErrorCode(),
+                    "查询失败，因为域"+domId+"下的属主"+ownerId+"不存在");
+        }else{
+            return domOwnerResService2.getOwnerRess(domId,ownerId);
         }
 
     }

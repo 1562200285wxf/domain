@@ -91,4 +91,8 @@
     <select id="getAllBase" resultType="cn.itsmith.sysutils.resacl.entities.User">
         SELECT * FROM t_user
     </select>
+
+    <select id="getOtherUsers" resultType="cn.itsmith.sysutils.resacl.entities.DomOwnerUser">
+        SELECT * FROM t_dom_owner_user WHERE domid=#{domId} AND ownerid!=#{ownerId} AND status=1
+    </select>
 </mapper>

@@ -67,6 +67,7 @@ public class DomOwnerResServiceImpl implements DomOwnerResService {
         return resultUtils;
     }
 
+
     /**
      * 找到maxOwnerRes[]
      * @param domId
@@ -146,6 +147,51 @@ public class DomOwnerResServiceImpl implements DomOwnerResService {
         return domResOwnerRNode;
     }
 
+
+
+
+
+
+
+    /**
+     * liu
+     * @param domId
+     * @param ownerId
+     * @return
+     */
+    @Override
+    public ResultUtils getOwnerRess(int domId, int ownerId) {
+        List<DomOwnerRes> domOwnerRess = rTypeMapper.queryResBydomowner(domId, ownerId);
+        ArrayList<DomResType> resList = new ArrayList<>();
+        if(domOwnerRess.size()==0){
+            throw new FailedException(ResponseInfo.NONRES_ERROR3.getErrorCode(),
+                    "查询失败，因为域"+domId+"下的属主"+ownerId+"没有拥有任何资源");
+        }else{
+            for (DomOwnerRes domOwnerRes:
+            domOwnerRess) {
+                Integer resTypeId = domOwnerRes.getResTypeId();
+                DomResType domResType = rTypeMapper.queryResBase(domId, resTypeId);
+                if(domResType!=null){
+                    resList.add(domResType);
+                }
+
+            }
+            ResultUtils resultUtils = new ResultUtils(
+                    ResponseInfo.SUCCESS.getErrorCode(),
+                    ResponseInfo.SUCCESS.getErrorMsg(),
+                    resList);
+            return resultUtils;
+        }
+
+    }
+
+    /**
+     * xie
+     * @param domId
+     * @param ownerId
+     * @param resTyeId
+     * @return
+     */
     @Override
     public boolean ownerResExist(int domId, int ownerId, int resTyeId) {
         DomOwnerRes domOwnerRes = domOwnerResMapper.selectById(domId, ownerId, resTyeId);

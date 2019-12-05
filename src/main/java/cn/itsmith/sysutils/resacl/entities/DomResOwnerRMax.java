@@ -12,7 +12,7 @@ public class DomResOwnerRMax {
 //    String ownerDes;
 //    Integer pId;
     DomResOwner data;
-    List<DomResType> domResTypes;//【max新树】
+    List<DomResType> domResTypes;//【max新树，其实是一层品种】
 
     public DomResOwnerRMax(DomResOwner data){
         this.data = data;
