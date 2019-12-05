@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.itsmith.sysutils.resacl.dao.InstanceMapper">
+    <resultMap id="Desk" type="cn.itsmith.sysutils.resacl.entities.Desk">
+        <result property="resId" column="resid"/>
+        <result property="name" column="name"/>
+        <result property="description" column="description"/>
+        <result property="shape" column="shape"/>
+    </resultMap>
+    <resultMap id="Room" type="cn.itsmith.sysutils.resacl.entities.Room">
+        <result property="resId" column="resid"/>
+        <result property="name" column="name"/>
+        <result property="description" column="description"/>
+        <result property="deskNo" column="deskno"/>
+        <result property="volume" column="volume"/>
+    </resultMap>
+    <sql id="Desk_Base_Column_List">
+        resid, name, description, shape
+    </sql>
+
+    <sql id="Room_Base_Column_List">
+        resid, name, description, deskno, volume
+    </sql>
+    <select id="selectAllDesk"  resultMap="Desk">
+        select
+        <include refid="Desk_Base_Column_List"/>
+        from t_desk
+    </select>
+
+    <select id="selectAllRoom"  resultMap="Room">
+        select
+        <include refid="Room_Base_Column_List"/>
+        from t_room
+    </select>
+</mapper>
