@@ -3,6 +3,7 @@ package cn.itsmith.sysutils.resacl.controller;
 
 
 
+import cn.itsmith.sysutils.resacl.common.utilss.AddResourceType;
 import cn.itsmith.sysutils.resacl.common.utilss.ChangeResourceTypeDes;
 import cn.itsmith.sysutils.resacl.common.utilss.DeleteResourceType;
 import cn.itsmith.sysutils.resacl.common.utilss.DomResTree;
@@ -23,20 +24,28 @@ import java.util.List;
 
 @Api(value="资源种类",tags={"资源种类Api"})
 @RestController
-public class ResTypeController {
+@RequestMapping("/DomResTypeController")
+public class DomResTypeController {
 
     @Autowired
     DomResTypeServiceImpl resTypeServiceImpl;
-    public ResTypeController(DomResTypeServiceImpl resTypeServiceImpl) {
+    public DomResTypeController(DomResTypeServiceImpl resTypeServiceImpl) {
         this.resTypeServiceImpl = resTypeServiceImpl;
     }
 
     @ApiOperation(value = "添加域资源种类", notes = "注册域在特定的域下添加资源种类")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "domResType", value = "资源种类", dataType = "DomResType",required = false,paramType = "body"),
+            @ApiImplicitParam(name = "domResType", value = "资源种类", dataType = "AddResourceType",required = false,paramType = "body"),
     })
     @RequestMapping(value="/addResourceType",method = RequestMethod.POST)
-    public ResultUtils addResourceType(@RequestBody DomResType domResType){
+    public ResultUtils addResourceType(@RequestBody AddResourceType addResourceType){
+        DomResType domResType = new DomResType();
+        domResType.setDomId(addResourceType.getDomId());
+        domResType.setResTypeId(addResourceType.getResTypeId());
+        domResType.setPId(addResourceType.getPId());
+        domResType.setResTypeDes(addResourceType.getResTypeDes());
+        domResType.setResName(addResourceType.getResName());
+        domResType.setStatus(1);
         ResultUtils result = resTypeServiceImpl.addResourceType(domResType);
         return result;
     }
@@ -45,8 +54,8 @@ public class ResTypeController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "changeResourceTypeDes", value = "修改域资源种类描述", dataType = "ChangeResourceTypeDes",required = false,paramType = "body"),
     })
-    @RequestMapping(value="/changeResourceTypeDes",method = RequestMethod.POST)
-    public ResultUtils changeResourceTypeDes(@RequestBody ChangeResourceTypeDes changeResourceTypeDes){
+    @RequestMapping(value="/updateResourceTypeDes",method = RequestMethod.POST)
+    public ResultUtils updateResourceTypeDes(@RequestBody ChangeResourceTypeDes changeResourceTypeDes){
         DomResType domResType = new DomResType();
         domResType.setDomId(changeResourceTypeDes.getDomid());
         domResType.setResTypeDes(changeResourceTypeDes.getRestypedes());
@@ -76,5 +85,15 @@ public class ResTypeController {
     @RequestMapping(value="/getDomResTree",method = RequestMethod.POST)
     public ResultUtils getDomResTree( @RequestBody DomResTree domResTree){
         return resTypeServiceImpl.getDomResTree(domResTree.getDomid(),domResTree.getResTypeId());
+    }
+
+
+    @ApiOperation(value = "查询域内资源种类测试")
+    @RequestMapping(value="/getDomResTreeTest",method = RequestMethod.GET)
+    public ResultUtils getDomResTreeTest(){
+        DomResTree domResTree1 = new DomResTree();
+        domResTree1.setDomid(1);
+        domResTree1.setResTypeId(0);
+        return resTypeServiceImpl.getDomResTree(domResTree1.getDomid(),domResTree1.getResTypeId());
     }
 }

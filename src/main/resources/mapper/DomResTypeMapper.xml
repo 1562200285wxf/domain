@@ -12,7 +12,7 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        domid, restypeid, restypedes, pid, status
+        domid, restypeid, restypedes, pid, resname, status
     </sql>
     <!--根据id查询资源种类-->
     <select id="selectById" resultMap="DomResType" parameterType="int">
@@ -141,7 +141,7 @@
             <if test="resTypeDes != null" >
                 restypedes,
             </if>
-            <if test="pid != null" >
+            <if test="pId != null" >
                 pid,
             </if>
             <if test="resName != null" >
@@ -161,8 +161,8 @@
             <if test="resTypeDes != null" >
                 #{resTypeDes,jdbcType=VARCHAR},
             </if>
-            <if test="pid != null" >
-                #{pid,jdbcType=INTEGER},
+            <if test="pId != null" >
+                #{pId,jdbcType=INTEGER},
             </if>
             <if test="resName != null" >
                 #{resName,jdbcType=CHAR},
@@ -181,8 +181,8 @@
             <if test="resTypeDes != null" >
                 restypedes = #{resTypeDes,jdbcType=VARCHAR},
             </if>
-            <if test="pid != null" >
-                pid = #{pid,jdbcType=INTEGER},
+            <if test="pId != null" >
+                pid = #{pId,jdbcType=INTEGER},
             </if>
             <if test="resName != null" >
                 #{resName,jdbcType=CHAR},
@@ -198,7 +198,7 @@
     update t_dom_res_type
     set domid = #{domId,jdbcType=INTEGER},
       restypedes = #{resTypeDes,jdbcType=VARCHAR},
-      pid = #{pid,jdbcType=INTEGER}
+      pid = #{pId,jdbcType=INTEGER}
     where restypeid = #{resTypeId,jdbcType=INTEGER}
   </update>
 </mapper>

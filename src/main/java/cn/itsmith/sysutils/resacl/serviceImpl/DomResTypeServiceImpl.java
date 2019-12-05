@@ -73,32 +73,15 @@ public class DomResTypeServiceImpl implements DomResTypeService {
             resultUtils.setMessage("域标识为"+domResType.getDomId()+"的不存在");
             return resultUtils;
         }
-        if(domResTypeMapper.selectByPrimaryKey(domResType.getResTypeId()) != null){
-            resultUtils.setCode(ResponseInfo.SUCCESS_IS.getErrorCode());
-            resultUtils.setMessage(String.format("种类为标识为%d的种类已经是t_dom_res_type成员,，添加失败",domResType.getResTypeId()));
-            return resultUtils;
-        }
-        if(domResType.getResTypeId()==0){
-            if(domResType.getPId()!=0) {
-                resultUtils.setCode(ResponseInfo.FALSE_IS.getErrorCode());
-                resultUtils.setMessage("资源种类为"+domResType.getResTypeId()+"添加失败节点为0的父节点也必须是0");
-                return resultUtils;
-            }
-            if(domResType.getPId()==0) {
-                domResTypeMapper.insertSelective(domResType);
-                resultUtils.setCode(ResponseInfo.SUCCESS_IS.getErrorCode());
-                resultUtils.setMessage(String.format("种类为标识为%d的种类已经是t_dom_res_type成员",domResType.getResTypeId()));
-                return resultUtils;
-            }
-        }
-        if( domResType.getResTypeId()!=0 && domResTypeMapper.selectByPrimaryKey(domResType.getPId())==null ){
+
+        if(domResTypeMapper.getDomResTypeByResTypeId(domResType.getDomId(),domResType.getPId())==null ){
             resultUtils.setCode(ResponseInfo.FALSE_IS.getErrorCode());
-            resultUtils.setMessage(String.format("种类为标识为%d的种类的父级节点%d不存在",domResType.getResTypeId(),domResType.getPId()));
+            resultUtils.setMessage(String.format("种类为标识为%d的种类的父级节点%d不存在,添加失败",domResType.getResTypeId(),domResType.getPId()));
             return resultUtils;
         }
         domResTypeMapper.insertSelective(domResType);
         resultUtils.setCode(ResponseInfo.SUCCESS_IS.getErrorCode());
-        resultUtils.setMessage(String.format("种类为标识为%d的种类已经是t_dom_res_type成员",domResType.getResTypeId()));
+        resultUtils.setMessage(String.format("种类为标识为%d的种类已经是t_dom_res_type成员,添加成功",domResType.getResTypeId()));
         return resultUtils;
     }
 
@@ -120,8 +103,8 @@ public class DomResTypeServiceImpl implements DomResTypeService {
             return resultUtils;
         }
         domResTypeMapper.updateByPrimaryKeySelective(domResType);
-        resultUtils.setCode(ResponseInfo.FALSE_IS.getErrorCode());
-        resultUtils.setMessage(String.format("种类为标识为%d的种类不是t_dom_res_type成员,，修改失败",domResType.getResTypeId()));
+        resultUtils.setCode(ResponseInfo.SUCCESS_IS.getErrorCode());
+        resultUtils.setMessage(String.format("种类为标识为%d的种类的描述修改成功",domResType.getResTypeId()));
         return resultUtils;
     }
 
