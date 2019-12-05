@@ -11,5 +11,5 @@ public class DomResInstanceA {
     Integer resTypeId;
     Integer resId;
     Integer resPid;
-    String insName;
+//    String insName;
 }
