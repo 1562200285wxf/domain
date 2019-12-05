@@ -9,4 +9,6 @@ import cn.itsmith.sysutils.resacl.utils.ResultUtils;
 public interface ResService {
     ResultUtils addRes(DomOwnerRes domOwnerRes);
     ResultUtils delRes(DomOwnerRes domOwnerRes);
+    //从基本表中查询特定属主下不存在的资源类型
+    ResultUtils getResWithoutOwner(Integer domId,Integer ownerId);
 }

@@ -170,6 +170,7 @@ ResService resService;
         }
 
         }
+        //-------------------------------------------------------------------------------------------------------------
 
     /**
      * select all
@@ -180,7 +181,7 @@ ResService resService;
      */
     @Autowired
     DomOwnerResService domOwnerResService2;
-    @ApiOperation(value = "查询资源种类树max", notes = "针对属主拥有的资源的查询操作")
+    @ApiOperation(value = "查询属主下拥有的资源", notes = "针对属主拥有的资源的查询操作")
     @RequestMapping(value="/queryallrestype/{domId}",method = RequestMethod.GET)
     public ResultUtils queryAllRes(@PathVariable(value="domId",required = true) Integer domId,
                                        @RequestParam(value="ownerId",required = true) Integer ownerId,
@@ -199,4 +200,25 @@ ResService resService;
         }
 
     }
+
+    @ApiOperation(value = "从基本表种查询属主下没有的资源table", notes = "针对属主拥有的资源的查询操作")
+    @RequestMapping(value="/queryrestypewithoutowner/{domId}",method = RequestMethod.GET)
+    public ResultUtils queryBaseResWithoutOwner(@PathVariable(value="domId",required = true) Integer domId,
+                                   @RequestParam(value="ownerId",required = true) Integer ownerId,
+                                   @RequestHeader(value = "Validate", required = true) String validate){
+
+        Integer varifycode  = domainMapper.varify(domId,validate);
+        if(varifycode!=1){
+            throw new FailedException(ResponseInfo.AUTH_FAILED.getErrorCode(),
+                    "不能查询域"+domId+"下的属主"+ownerId+"拥有的资源种类，因为"+
+                            ResponseInfo.AUTH_FAILED.getErrorMsg());
+        }else if(!(domResOwnerService1.ownerExist(domId,ownerId))){
+            throw new FailedException(ResponseInfo.OWNER_FAILED.getErrorCode(),
+                    "查询失败，因为域"+domId+"下的属主"+ownerId+"不存在");
+        }else{
+            return resService.getResWithoutOwner(domId,ownerId);
+        }
+
+    }
+
 }

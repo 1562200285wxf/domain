@@ -83,6 +83,12 @@
         WHERE  t_dom_res_type.DomId=#{domId}
         AND t_dom_res_type.PId=#{pId}
     </select>
+    <select id="queryResBases" resultType="cn.itsmith.sysutils.resacl.entities.DomResType">
+        SELECT * FROM t_dom_res_type
+        WHERE  t_dom_res_type.DomId=#{domId}
+        AND t_dom_res_type.status=1
+    </select>
+
 
     <!--    wang-->
     <select id="selectByPrimaryKey" resultMap="DomResType" parameterType="java.lang.Integer" >

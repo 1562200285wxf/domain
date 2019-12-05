@@ -38,6 +38,7 @@ public int addOwnerRes(DomOwnerRes domOwnerRes);
     //查询基本表
     public DomResType queryResBase(@Param("domId") Integer domId, @Param("resTypeId") Integer resTypeId);
     public List<DomResType> queryBaseByPid(@Param("domId") Integer domId,@Param("pId") Integer pId);
+    public List<DomResType> queryResBases(Integer domId);
 
 
     //wang

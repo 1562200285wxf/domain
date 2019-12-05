@@ -5,9 +5,8 @@ import cn.itsmith.sysutils.resacl.common.exception.FailedException;
 import cn.itsmith.sysutils.resacl.dao.DomResInstanceMapper;
 import cn.itsmith.sysutils.resacl.dao.DomResOwnerMapper;
 import cn.itsmith.sysutils.resacl.dao.DomResTypeMapper;
-import cn.itsmith.sysutils.resacl.entities.DomOwnerRes;
+import cn.itsmith.sysutils.resacl.entities.*;
 
-import cn.itsmith.sysutils.resacl.entities.DomResInstance;
 import cn.itsmith.sysutils.resacl.service.DomResInstanceService;
 import cn.itsmith.sysutils.resacl.service.DomResOwnerService;
 import cn.itsmith.sysutils.resacl.service.ResService;
@@ -15,6 +14,7 @@ import cn.itsmith.sysutils.resacl.utils.ResultUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Iterator;
 import java.util.List;
 
 @Service(value="ResService")
@@ -139,5 +139,35 @@ public class ResServiceImp implements ResService {
                     domOwnerRes.getResTypeId());
             return  resultUniteServiceImp.resultSuccess(domOwnerRes1);
         }
+    }
+
+    /**
+     * 从基本表中查询特定属主下不存在的资源类型
+     * @param domId
+     * @param ownerId
+     * @return
+     */
+    @Override
+    public ResultUtils getResWithoutOwner(Integer domId, Integer ownerId) {
+        List<DomOwnerRes> domOwnerRes = rTypeMapper.queryResBydomowner(domId, ownerId);
+        List<DomResType> domResTypes = rTypeMapper.queryResBases(domId);
+        if(domOwnerRes.size()!=0){
+
+            Iterator<DomResType> it = domResTypes.iterator();
+            while(it.hasNext()) {
+                DomResType domResType = it.next();
+                for (DomOwnerRes domOwnerRes1:
+                        domOwnerRes) {
+                    if(domResType.getResTypeId().equals(domOwnerRes1.getResTypeId())){
+                        it.remove();
+                        break;
+                    }
+                }
+            }
+            return resultUniteServiceImp.resultSuccess(domResTypes);
+        }else{
+            return resultUniteServiceImp.resultSuccess(domResTypes);
+        }
+
     }
 }

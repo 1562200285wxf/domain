@@ -209,6 +209,11 @@ public class UserServiceImp implements UserService {
 
     }
 
+    /**
+     * 查询特定属主下不存在的基本Users
+     * @param domOwnerUser
+     * @return
+     */
     @Override
     public ResultUtils queryBaseUsers(DomOwnerUser domOwnerUser) {
         List<User> allBase = userMapper.getAllBase();
