@@ -51,7 +51,7 @@ public class DomResOperationServiceImpl implements DomResOperationService {
     public ResultUtils deleteResOperation(DomResOperation domResOperation) {
         ResultUtils resultUtils = new ResultUtils();
         domResOperation.setStatus(0);
-        if (domResOperationMapper.updateStatus(domResOperation) == 1) {
+        if (domResOperationMapper.updateStatus(domResOperation) !=0) {
             resultUtils.setCode(ResponseInfo.SUCCESS.getErrorCode());
             resultUtils.setMessage(String.format("成功移除标识为%d的域下标识为%d的资源种类添加标识为%d的资源可用权限",
                     domResOperation.getDomId(), domResOperation.getResTypeId(), domResOperation.getOpId()));
@@ -112,7 +112,7 @@ public class DomResOperationServiceImpl implements DomResOperationService {
                     String.format("标识为%d的域下标识为%d的资源种类的标识为%d的资源可用权限已经是可继承",
                     domResOperation.getDomId(), domResOperation.getResTypeId(), domResOperation.getOpId()));
         domResOperation.setIsExtend(1);
-        if(domResOperationMapper.updateIsExtend(domResOperation)==1){
+        if(domResOperationMapper.updateIsExtend(domResOperation)!=0){
             resultUtils.setCode(ResponseInfo.SUCCESS.getErrorCode());
             resultUtils.setMessage(String.format("成功修改标识为%d的域下标识为%d的资源种类的标识为%d的可用权限为可继承",
                     domResOperation.getDomId(), domResOperation.getResTypeId(),
@@ -132,7 +132,7 @@ public class DomResOperationServiceImpl implements DomResOperationService {
                     String.format("标识为%d的域下标识为%d的资源种类的标识为%d的资源可用权限已经是不可继承",
                             domResOperation.getDomId(), domResOperation.getResTypeId(), domResOperation.getOpId()));
         domResOperation.setIsExtend(0);
-        if(domResOperationMapper.updateIsExtend(domResOperation)==1){
+        if(domResOperationMapper.updateIsExtend(domResOperation)!=0){
             resultUtils.setCode(ResponseInfo.SUCCESS.getErrorCode());
             resultUtils.setMessage(String.format("成功修改标识为%d的域下标识为%d的资源种类的标识为%d的可用权限为不可继承",
                     domResOperation.getDomId(), domResOperation.getResTypeId(),
@@ -152,7 +152,7 @@ public class DomResOperationServiceImpl implements DomResOperationService {
                     String.format("标识为%d的域下标识为%d的资源种类的标识为%d的资源可用权限已经是通用",
                             domResOperation.getDomId(), domResOperation.getResTypeId(), domResOperation.getOpId()));
         domResOperation.setIsCommon(1);
-        if(domResOperationMapper.updateIsCommon(domResOperation)==1){
+        if(domResOperationMapper.updateIsCommon(domResOperation)!=0){
             resultUtils.setCode(ResponseInfo.SUCCESS.getErrorCode());
             resultUtils.setMessage(String.format("成功修改标识为%d的域下标识为%d的资源种类的标识为%d的可用权限为通用",
                     domResOperation.getDomId(), domResOperation.getResTypeId(),
@@ -172,7 +172,7 @@ public class DomResOperationServiceImpl implements DomResOperationService {
                     String.format("标识为%d的域下标识为%d的资源种类的标识为%d的资源可用权限已经是不可通用",
                             domResOperation.getDomId(), domResOperation.getResTypeId(), domResOperation.getOpId()));
         domResOperation.setIsCommon(0);
-        if(domResOperationMapper.updateIsCommon(domResOperation)==1){
+        if(domResOperationMapper.updateIsCommon(domResOperation)!=0){
             resultUtils.setCode(ResponseInfo.SUCCESS.getErrorCode());
             resultUtils.setMessage(String.format("成功修改标识为%d的域下标识为%d的资源种类的标识为%d的可用权限为不可通用",
                     domResOperation.getDomId(), domResOperation.getResTypeId(),

@@ -46,7 +46,7 @@
                 opdes = #{opDes}
             </if>
         </set>
-        where domid=#{domId} and restypeid=#{resTypeId} and opid=#{opId}
+        where domid=#{domId} and restypeid=#{resTypeId} and opid=#{opId} and status=1
     </update>
 <!--    修改是否可继承-->
     <update id="updateIsExtend" parameterType="cn.itsmith.sysutils.resacl.entities.DomResOperation">
@@ -56,7 +56,7 @@
                 isextend = #{isExtend}
             </if>
         </set>
-        where domid=#{domId} and restypeid=#{resTypeId} and opid=#{opId}
+        where domid=#{domId} and restypeid=#{resTypeId} and opid=#{opId} and status=1
     </update>
 <!--修改是否是通用-->
     <update id="updateIsCommon" parameterType="cn.itsmith.sysutils.resacl.entities.DomResOperation">
@@ -66,7 +66,7 @@
                 iscommon = #{isCommon}
             </if>
         </set>
-        where domid=#{domId} and restypeid=#{resTypeId} and opid=#{opId}
+        where domid=#{domId} and restypeid=#{resTypeId} and opid=#{opId} and status=1
     </update>
 
     <!--根据id查询-->
@@ -82,7 +82,7 @@
         select
         <include refid="Base_Column_List"/>
         from t_dom_res_operation
-        WHERE domid=#{domId} and restypeid=#{resTypeId} and opid=#{opId}
+        WHERE domid=#{domId} and restypeid=#{resTypeId} and opid=#{opId} and status=1
     </select>
 
 </mapper>
