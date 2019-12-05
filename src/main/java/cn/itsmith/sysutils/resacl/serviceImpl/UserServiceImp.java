@@ -283,4 +283,19 @@ public class UserServiceImp implements UserService {
             return resultUniteServiceImp.resultSuccess(otherUsers);
         }
     }
+
+
+    /**
+     * 添加模块3
+     * 一个新的界面
+     * 点击机构后的简单成员查询，剔除已经有的
+     */
+    @Override
+    public ResultUtils queryAnyOtherUsers(DomOwnerUser domOwnerUser) {
+        Integer domId = domOwnerUser.getDomId();
+        Integer ownerId = domOwnerUser.getOwnerId();
+        List<DomOwnerUser> domOwnerUsers = userMapper.queryUserBydomowner(domId, ownerId);
+
+        return null;
+    }
 }

@@ -30,6 +30,12 @@ public interface UserService {
      */
     //查询其他属主下的所有成员，且本属主下不存在的成员
     ResultUtils queryOtherUsers(DomOwnerUser domOwnerUser);
+/**
+ * 添加模块3
+ * 一个新的界面
+ * 点击机构后的简单成员查询，剔除已经有的
+ */
+ResultUtils queryAnyOtherUsers(DomOwnerUser domOwnerUser);
 
 
 }

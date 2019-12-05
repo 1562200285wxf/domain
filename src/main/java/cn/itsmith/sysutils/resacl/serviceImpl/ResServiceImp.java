@@ -170,4 +170,17 @@ public class ResServiceImp implements ResService {
         }
 
     }
+
+    @Override
+    public ResultUtils addResFromBase(List<DomOwnerRes> domOwnerRes) {
+        if(domOwnerRes.size()!=0){
+            Iterator<DomOwnerRes> it = domOwnerRes.iterator();
+            while(it.hasNext()){
+                this.addRes(it.next());
+            }
+            return resultUniteServiceImp.resultSuccess(domOwnerRes);
+        }else{
+            return resultUniteServiceImp.resultSuccess("请勾选资源类型去添加");
+        }
+    }
 }

@@ -7,6 +7,8 @@ import cn.itsmith.sysutils.resacl.dao.DomResTypeMapper;
 import cn.itsmith.sysutils.resacl.dao.DomainMapper;
 import cn.itsmith.sysutils.resacl.entities.DomOwnerRes;
 import cn.itsmith.sysutils.resacl.entities.DomOwnerResA;
+import cn.itsmith.sysutils.resacl.entities.DomOwnerUser;
+import cn.itsmith.sysutils.resacl.entities.DomOwnerUserA;
 import cn.itsmith.sysutils.resacl.service.DomOwnerResMaxService;
 import cn.itsmith.sysutils.resacl.service.DomOwnerResService;
 import cn.itsmith.sysutils.resacl.service.DomResOwnerService;
@@ -18,6 +20,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 @Api(value="资源Controller",tags={"属主拥有资源Api"})
@@ -220,5 +224,38 @@ ResService resService;
         }
 
     }
+
+
+    @ApiOperation(value = "资源类型添加,从base表中复选多条资源类型", notes = "针对属主拥有资源的添加操作")
+    @RequestMapping(value="/addresfromBase",method = RequestMethod.POST)
+    public ResultUtils addResFromBase(@RequestBody List<DomOwnerResA> DomOwnerResAS, @RequestHeader(value = "token", required = true) String validate){
+        List<DomOwnerRes> OwnerResList = new ArrayList<DomOwnerRes>();
+        Iterator<DomOwnerResA> it = DomOwnerResAS.iterator();
+        while(it.hasNext()){
+            DomOwnerResA next = it.next();
+            DomOwnerRes domOwnerRes = new DomOwnerRes();
+            domOwnerRes.setDomId(next.getDomId());
+            domOwnerRes.setOwnerId(next.getOwnerId());
+            domOwnerRes.setResTypeId(next.getResTypeId());
+            OwnerResList.add(domOwnerRes);
+        }
+//判断一个就行了，前台规定是【当前域】的【当前属主】下
+        Integer domId=DomOwnerResAS.get(0).getDomId();
+        Integer ownerId = DomOwnerResAS.get(0).getOwnerId();
+        Integer varifycode  = domainMapper.varify(domId,validate);
+        if(varifycode!=1){
+            throw new FailedException(ResponseInfo.AUTH_FAILED.getErrorCode(),
+                    "不能将用户"+DomOwnerResAS.get(0).getResTypeId()+"加入到域"+DomOwnerResAS.get(0).getDomId()+
+                            "下，因为"+ResponseInfo.AUTH_FAILED.getErrorMsg());
+        }else if(!(domResOwnerService1.ownerExist(domId,ownerId))){
+            throw new FailedException(ResponseInfo.OWNER_FAILED.getErrorCode(),
+                    "查询失败，因为域"+domId+"下的属主"+ownerId+"不存在"
+            );
+        }else{
+            return resService.addResFromBase(OwnerResList);
+        }
+
+    }
+
 
 }
