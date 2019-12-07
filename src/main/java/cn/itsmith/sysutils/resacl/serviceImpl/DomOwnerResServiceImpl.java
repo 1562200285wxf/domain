@@ -27,15 +27,17 @@ public class DomOwnerResServiceImpl implements DomOwnerResService {
 
     @Autowired
     DomResTypeMapper rTypeMapper;
+
     /**
      * 获取资源属主树
+     *
      * @param domId
      * @param ownerId
      * @return
      */
 
     @Override
-    public ResultUtils getOwnerResTree(int domId, int ownerId){
+    public ResultUtils getOwnerResTree(int domId, int ownerId) {
         //DomResOwnerR domResOwnerR = ownerMapper.selectRById(domId, ownerId);
         DomOwnerRes domOwnerRes = new DomOwnerRes();
         //假头，而数据库中万万没有这一条数据
@@ -46,7 +48,7 @@ public class DomOwnerResServiceImpl implements DomOwnerResService {
         DomResOwnerRNode domResOwnerRNode0 = new DomResOwnerRNode(domOwnerRes);
         //List<DomOwnerRes> domOwnerRess = rTypeMapper.queryResBydomowner(domId, ownerId);
         List<DomOwnerRes> maxOwnerResMaxs = this.getMaxOwnerRes(domId, ownerId);
-        for (DomOwnerRes domOwnerRes1:
+        for (DomOwnerRes domOwnerRes1 :
                 maxOwnerResMaxs) {
             DomResOwnerRNode domResOwnerRNodeMax = new DomResOwnerRNode(domOwnerRes1);
             DomResOwnerRNode domResOwnerRNode = createOwnerResTree(domResOwnerRNodeMax);
@@ -70,42 +72,43 @@ public class DomOwnerResServiceImpl implements DomOwnerResService {
 
     /**
      * 找到maxOwnerRes[]
+     *
      * @param domId
      * @param ownerId
      * @return
      */
-    public List<DomOwnerRes> getMaxOwnerRes(int domId, int ownerId){
+    public List<DomOwnerRes> getMaxOwnerRes(int domId, int ownerId) {
         List<DomOwnerRes> domOwnerRess = rTypeMapper.queryResBydomowner(domId, ownerId);
-        if(domOwnerRess.size()==0){
+        if (domOwnerRess.size() == 0) {
             throw new FailedException(ResponseInfo.NONRES_ERROR3.getErrorCode(),
-                    "查询失败，因为域"+domId+"下的属主"+ownerId+"没有拥有任何资源");
+                    "查询失败，因为域" + domId + "下的属主" + ownerId + "没有拥有任何资源");
         }
         List<DomOwnerRes> list = new ArrayList<DomOwnerRes>();
-        for (DomOwnerRes domOwnerRes:
+        for (DomOwnerRes domOwnerRes :
                 domOwnerRess) {
             Integer resTypeId = domOwnerRes.getResTypeId();
-            System.out.println("======================resTypeId  "+resTypeId);
+            System.out.println("======================resTypeId  " + resTypeId);
             DomResType domResType = rTypeMapper.queryResBase(domId, resTypeId);
-            System.out.println("======================domResType  "+domResType);
+            System.out.println("======================domResType  " + domResType);
             //if(domResType!=null)为了防止逻辑表有资源类型而基本表没有资源类型【防止手动插入打翻添加逻辑】
-            if(domResType!=null){
+            if (domResType != null) {
                 Integer pId = domResType.getPId();
                 DomOwnerRes domOwnerRes1 = rTypeMapper.queryOwnerRes(domId, ownerId, pId);
-                if(domOwnerRes1==null){
+                if (domOwnerRes1 == null) {
                     list.add(domOwnerRes);
                 }
             }
 
 
-
         }
-        System.out.println("================listlength"+list.size());
+        System.out.println("================listlength" + list.size());
         return list;
     }
 
 
     /**
      * 递归函数，传入树节点生成一个树，返回树的头节点
+     *
      * @param domResOwnerRNode
      * @return
      */
@@ -114,7 +117,7 @@ public class DomOwnerResServiceImpl implements DomOwnerResService {
         Integer ownerId = domResOwnerRNode.getData().getOwnerId();
         Integer resTypeId = domResOwnerRNode.getData().getResTypeId();
         List<DomResType> domResTypess = rTypeMapper.queryBaseByPid(domId, resTypeId);
-        for (DomResType domResType:
+        for (DomResType domResType :
                 domResTypess) {
             Integer resTypeId1 = domResType.getResTypeId();
             DomOwnerRes domOwnerRes = rTypeMapper.queryOwnerRes(domId, ownerId, resTypeId1);
@@ -139,8 +142,8 @@ public class DomOwnerResServiceImpl implements DomOwnerResService {
 //            domResOwnerRNode.getChildList().add(domResOwnerRNode1);
 //        }
         //递归遍历子节点，让每个子节点递归生成子树
-        for(cn.itsmith.sysutils.resacl.utils.DomResOwnerRNode domResOwnerRNode1 : domResOwnerRNode.getChildList()){
-            if(domResOwnerRNode1.getData() != null){
+        for (cn.itsmith.sysutils.resacl.utils.DomResOwnerRNode domResOwnerRNode1 : domResOwnerRNode.getChildList()) {
+            if (domResOwnerRNode1.getData() != null) {
                 createOwnerResTree(domResOwnerRNode1);
             }
         }
@@ -148,13 +151,9 @@ public class DomOwnerResServiceImpl implements DomOwnerResService {
     }
 
 
-
-
-
-
-
     /**
      * liu
+     *
      * @param domId
      * @param ownerId
      * @return
@@ -163,27 +162,23 @@ public class DomOwnerResServiceImpl implements DomOwnerResService {
     public ResultUtils getOwnerRess(int domId, int ownerId) {
         List<DomOwnerRes> domOwnerRess = rTypeMapper.queryResBydomowner(domId, ownerId);
         ArrayList<DomResType> resList = new ArrayList<>();
-        if(domOwnerRess.size()==0){
-            throw new FailedException(ResponseInfo.NONRES_ERROR3.getErrorCode(),
-                    "查询失败，因为域"+domId+"下的属主"+ownerId+"没有拥有任何资源");
-        }else{
-            for (DomOwnerRes domOwnerRes:
-            domOwnerRess) {
-                Integer resTypeId = domOwnerRes.getResTypeId();
-                DomResType domResType = rTypeMapper.queryResBase(domId, resTypeId);
-                if(domResType!=null){
-                    resList.add(domResType);
-                }
-
+        for (DomOwnerRes domOwnerRes :
+                domOwnerRess) {
+            Integer resTypeId = domOwnerRes.getResTypeId();
+            DomResType domResType = rTypeMapper.queryResBase(domId, resTypeId);
+            if (domResType != null) {
+                resList.add(domResType);
             }
-            ResultUtils resultUtils = new ResultUtils(
-                    ResponseInfo.SUCCESS.getErrorCode(),
-                    ResponseInfo.SUCCESS.getErrorMsg(),
-                    resList);
-            return resultUtils;
-        }
 
+        }
+        ResultUtils resultUtils = new ResultUtils(
+                ResponseInfo.SUCCESS.getErrorCode(),
+                ResponseInfo.SUCCESS.getErrorMsg(),
+                resList);
+        return resultUtils;
     }
+
+
 
     /**
      * xie

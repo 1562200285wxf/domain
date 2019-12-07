@@ -225,7 +225,7 @@ public ResultUtils queryUserTree(@RequestParam(value="domId",required = true) In
      * @param validate
      * @return
      */
-    @ApiOperation(value = "成员添加,从base表中复选多条成员", notes = "针对属主成员的添加操作")
+    @ApiOperation(value = "成员添加,从base表中复选多条成员[添加模块2通用]", notes = "针对属主成员的添加操作")
     @RequestMapping(value="/addusersfromBase",method = RequestMethod.POST)
     public ResultUtils addUsersFromBase(@RequestBody List<DomOwnerUserA> domOwnerUserAS, @RequestHeader(value = "token", required = true) String validate){
         List<DomOwnerUser> domOwnerUsers = new ArrayList<DomOwnerUser>();

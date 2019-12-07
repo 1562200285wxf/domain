@@ -5,10 +5,7 @@ import cn.itsmith.sysutils.resacl.common.exception.FailedException;
 import cn.itsmith.sysutils.resacl.dao.DomOwnerUserMapper;
 import cn.itsmith.sysutils.resacl.dao.DomResOwnerMapper;
 import cn.itsmith.sysutils.resacl.dao.DomUserOperationMapper;
-import cn.itsmith.sysutils.resacl.entities.DomOwnerUser;
-import cn.itsmith.sysutils.resacl.entities.DomOwnerUserA;
-import cn.itsmith.sysutils.resacl.entities.DomUserOperation;
-import cn.itsmith.sysutils.resacl.entities.User;
+import cn.itsmith.sysutils.resacl.entities.*;
 import cn.itsmith.sysutils.resacl.service.DomResOwnerService;
 import cn.itsmith.sysutils.resacl.service.UserService;
 import cn.itsmith.sysutils.resacl.utils.ResultUtils;
@@ -261,13 +258,35 @@ public class UserServiceImp implements UserService {
     public ResultUtils queryOtherUsers(DomOwnerUser domOwnerUser) {
         //where ownerid!=#{ownerId}
         List<DomOwnerUser> otherUsers = userMapper.getOtherUsers(domOwnerUser.getDomId(),domOwnerUser.getOwnerId());
+        List<DomOwnerUserB> domOwnerUserBS = new ArrayList<DomOwnerUserB>();
+        for (DomOwnerUser domOwnerUser2:
+        otherUsers) {
+            Integer ownerId = domOwnerUser2.getOwnerId();
+            Integer domId = domOwnerUser2.getDomId();
+            DomResOwner domResOwner = ownerMapper1.selectById(domId, ownerId);
+          String ownerName = domResOwner.getOwnerName();
+
+            DomOwnerUserB domOwnerUserB = new DomOwnerUserB();
+            domOwnerUserB.setDomId(domOwnerUser2.getDomId());
+            domOwnerUserB.setOwnerId(domOwnerUser2.getOwnerId());
+            domOwnerUserB.setId(domOwnerUser2.getId());
+            domOwnerUserB.setIsAdmin(domOwnerUser2.getIsAdmin());
+            domOwnerUserB.setStatus(domOwnerUser2.getStatus());
+            domOwnerUserB.setUserName(domOwnerUser2.getUserName());
+            domOwnerUserB.setUserId(domOwnerUser2.getUserId());
+          if(ownerName!=null){
+              domOwnerUserB.setOwnerName(ownerName);
+          }
+            domOwnerUserBS.add(domOwnerUserB);
+
+        }
         //这个查询的是当前属主拥有的成员
         List<DomOwnerUser> allDomUsers = userMapper.queryUserBydomowner(domOwnerUser.getDomId(), domOwnerUser.getOwnerId());
         if(allDomUsers.size()!=0){
             //待删的集合一定要用迭代器，不然报错
-            Iterator<DomOwnerUser> it = otherUsers.iterator();
+            Iterator<DomOwnerUserB> it = domOwnerUserBS.iterator();
             while(it.hasNext()) {
-                DomOwnerUser otherUser = it.next();
+                DomOwnerUserB otherUser = it.next();
                 String userName = userMapper.queryUserName(otherUser.getUserId());
                 otherUser.setUserName(userName);
                 for (DomOwnerUser domOwnerUser1:
@@ -278,9 +297,9 @@ public class UserServiceImp implements UserService {
                     }
                 }
             }
-            return resultUniteServiceImp.resultSuccess(otherUsers);
+            return resultUniteServiceImp.resultSuccess(domOwnerUserBS);
         }else{
-            return resultUniteServiceImp.resultSuccess(otherUsers);
+            return resultUniteServiceImp.resultSuccess(domOwnerUserBS);
         }
     }
 
