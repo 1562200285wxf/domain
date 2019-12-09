@@ -2,12 +2,14 @@ package cn.itsmith.sysutils.resacl.serviceImpl;
 
 import cn.itsmith.sysutils.resacl.common.config.ResponseInfo;
 import cn.itsmith.sysutils.resacl.common.exception.FailedException;
+import cn.itsmith.sysutils.resacl.dao.DomResTypeMapper;
 import cn.itsmith.sysutils.resacl.dao.DomUserOperationMapper;
+import cn.itsmith.sysutils.resacl.entities.DomResType;
 import cn.itsmith.sysutils.resacl.entities.DomUserOperation;
 
 import cn.itsmith.sysutils.resacl.service.DomUserOperationService;
 import cn.itsmith.sysutils.resacl.utils.ResultUtils;
-import lombok.Data;
+import cn.itsmith.sysutils.resacl.utils.OperationDetail;;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,8 +22,12 @@ public class DomUserOperationServiceImpl implements DomUserOperationService{
     DomUserOperationMapper domUserOperationMapper;
 
     ResultUniteServiceImp resultUniteServiceImp = new ResultUniteServiceImp();
+@Autowired
+    DomResTypeMapper domResTypeMapper;
+
     @Override
     public ResultUtils selectOps(DomUserOperation domUserOperation) {
+        Integer domId = domUserOperation.getDomId();
 
         List<DomUserOperation> domUserOperation1 =
                 domUserOperationMapper.selectOps(domUserOperation);
@@ -42,14 +48,30 @@ public class DomUserOperationServiceImpl implements DomUserOperationService{
                             "没有任何资源授权记录"
             );
         }else{
-            List<DomUserOperation> domUserOperation3 = new ArrayList<DomUserOperation>();
+//            List<DomUserOperation> domUserOperation3 = new ArrayList<DomUserOperation>();
+//            for (DomUserOperation domUserOperation2:
+//                    domUserOperation1) {
+//                if(domUserOperation2.getStatus().equals(1)){
+//                    domUserOperation3.add(domUserOperation2);
+//                }
+//            }
+            List<OperationDetail> operationDetails = new ArrayList<OperationDetail>();
             for (DomUserOperation domUserOperation2:
                     domUserOperation1) {
                 if(domUserOperation2.getStatus().equals(1)){
-                    domUserOperation3.add(domUserOperation2);
+                    Integer resTypeId = domUserOperation2.getResTypeId();
+                    Integer resId = domUserOperation2.getResId();
+                    Integer opId = domUserOperation2.getOpId();
+                    OperationDetail operationDetail = new OperationDetail();
+                    DomResType domResType = domResTypeMapper.queryResBase(domId, resTypeId);
+                    String resTypeName = domResType.getResName();
+                    operationDetail.setResTypeName(resTypeName);
+
+
                 }
             }
-            return  resultUniteServiceImp.resultSuccess(domUserOperation3); //成功返回值
+            //return  resultUniteServiceImp.resultSuccess(domUserOperation3); //成功返回值
+            return  resultUniteServiceImp.resultSuccess(operationDetails);
         }
 
     }
