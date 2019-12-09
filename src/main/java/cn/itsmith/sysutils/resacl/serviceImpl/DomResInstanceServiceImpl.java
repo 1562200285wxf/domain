@@ -177,7 +177,7 @@ public class DomResInstanceServiceImpl implements DomResInstanceService {
             }
         }
         DomResInstanceR domResInstanceR = new DomResInstanceR();
-        List<TableData> tableData = new ArrayList<TableData>();
+        List<InsAttributes> tableData = new ArrayList<InsAttributes>();
         //1代表桌子
         if(resTypeId==1){
             List<Desk> desks = instanceMapper.selectAllDesk();
@@ -189,15 +189,15 @@ public class DomResInstanceServiceImpl implements DomResInstanceService {
                     }
                 }
             }
-
-            TableData tableData1 = new TableData("编号", "resId");
-            tableData.add(tableData1);
-            TableData tableData2 = new TableData("名称", "name");
-            tableData.add(tableData2);
-            TableData tableData3 = new TableData("描述", "description");
-            tableData.add(tableData3);
-            TableData tableData4 = new TableData("形状", "shape");
-            tableData.add(tableData4);
+            tableData = instanceMapper.selectInsAttributes(resTypeId);
+//            InsAttributes insAttributes1 = new InsAttributes("编号", "resId");
+//            tableData.add(insAttributes1);
+//            InsAttributes insAttributes2 = new InsAttributes("名称", "name");
+//            tableData.add(insAttributes2);
+//            InsAttributes insAttributes3 = new InsAttributes("描述", "description");
+//            tableData.add(insAttributes3);
+//            InsAttributes insAttributes4 = new InsAttributes("形状", "shape");
+//            tableData.add(insAttributes4);
             domResInstanceR.setTableData(tableData);
             domResInstanceR.setDomResInstances(Collections.singletonList(desks1));
         }
@@ -212,16 +212,17 @@ public class DomResInstanceServiceImpl implements DomResInstanceService {
                     }
                 }
             }
-            TableData tableData1 = new TableData("编号", "resId");
-            tableData.add(tableData1);
-            TableData tableData2 = new TableData("名称", "name");
-            tableData.add(tableData2);
-            TableData tableData3 = new TableData("描述", "description");
-            tableData.add(tableData3);
-            TableData tableData4 = new TableData("拥有桌子数量", "deskNo");
-            tableData.add(tableData4);
-            TableData tableData5 = new TableData("可容纳人数", "volume");
-            tableData.add(tableData5);
+            tableData = instanceMapper.selectInsAttributes(resTypeId);
+//            InsAttributes insAttributes1 = new InsAttributes("编号", "resId");
+//            tableData.add(insAttributes1);
+//            InsAttributes insAttributes2 = new InsAttributes("名称", "name");
+//            tableData.add(insAttributes2);
+//            InsAttributes insAttributes3 = new InsAttributes("描述", "description");
+//            tableData.add(insAttributes3);
+//            InsAttributes insAttributes4 = new InsAttributes("拥有桌子数量", "deskNo");
+//            tableData.add(insAttributes4);
+//            InsAttributes insAttributes5 = new InsAttributes("可容纳人数", "volume");
+//            tableData.add(insAttributes5);
             domResInstanceR.setTableData(tableData);
             domResInstanceR.setDomResInstances(Collections.singletonList(rooms1));
         }

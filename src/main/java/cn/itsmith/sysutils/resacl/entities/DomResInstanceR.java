@@ -6,6 +6,6 @@ import java.util.List;
 
 @Data
 public class DomResInstanceR {
-    List<TableData> tableData;
+    List<InsAttributes> tableData;
     List<Object> domResInstances;
 }

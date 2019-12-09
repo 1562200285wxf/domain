@@ -78,14 +78,12 @@ public class DomResOperationServiceImpl implements DomResOperationService {
             if(domResOperation.getStatus()==1)
                 domResOperations1.add(domResOperation);
         }
-        if(domResOperations.size()!=0){
+
             resultUtils.setCode(ResponseInfo.SUCCESS.getErrorCode());
             resultUtils.setMessage(String.format("成功获取标识为%d下的标识为%d的资源种类的可用权限",
                     domId, resTypeId));
             resultUtils.setData(domResOperations1);
-        }else{
-            throw new FailedException("数据查找失败");
-        }
+
         return resultUtils;
     }
 
