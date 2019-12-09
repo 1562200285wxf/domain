@@ -2,10 +2,11 @@ package cn.itsmith.sysutils.resacl.serviceImpl;
 
 import cn.itsmith.sysutils.resacl.common.config.ResponseInfo;
 import cn.itsmith.sysutils.resacl.common.exception.FailedException;
+import cn.itsmith.sysutils.resacl.dao.DomResOperationMapper;
 import cn.itsmith.sysutils.resacl.dao.DomResTypeMapper;
 import cn.itsmith.sysutils.resacl.dao.DomUserOperationMapper;
-import cn.itsmith.sysutils.resacl.entities.DomResType;
-import cn.itsmith.sysutils.resacl.entities.DomUserOperation;
+import cn.itsmith.sysutils.resacl.dao.InstanceMapper;
+import cn.itsmith.sysutils.resacl.entities.*;
 
 import cn.itsmith.sysutils.resacl.service.DomUserOperationService;
 import cn.itsmith.sysutils.resacl.utils.ResultUtils;
@@ -25,6 +26,10 @@ public class DomUserOperationServiceImpl implements DomUserOperationService{
 @Autowired
     DomResTypeMapper domResTypeMapper;
 
+@Autowired
+    InstanceMapper instanceMapper;
+@Autowired
+DomResOperationMapper domResOperationMapper;
     @Override
     public ResultUtils selectOps(DomUserOperation domUserOperation) {
         Integer domId = domUserOperation.getDomId();
@@ -63,9 +68,45 @@ public class DomUserOperationServiceImpl implements DomUserOperationService{
                     Integer resId = domUserOperation2.getResId();
                     Integer opId = domUserOperation2.getOpId();
                     OperationDetail operationDetail = new OperationDetail();
+                    //resTypeName
                     DomResType domResType = domResTypeMapper.queryResBase(domId, resTypeId);
                     String resTypeName = domResType.getResName();
                     operationDetail.setResTypeName(resTypeName);
+                    //resName
+                    if(resTypeId.equals(1)){
+                        List<Desk> desks = instanceMapper.selectAllDesk();
+                        for (Desk desk:
+                        desks) {
+                            Integer resId1 = desk.getResId();
+                            if(resId.equals(resId1)){
+                                String deskName = desk.getName();
+                                operationDetail.setResName(deskName);
+                            }
+                        }
+                    }else if(resTypeId.equals(2)){
+                        List<Room> rooms = instanceMapper.selectAllRoom();
+                        for (Room room:
+                             rooms) {
+                            Integer resId1 = room.getResId();
+                            if(resId.equals(resId1)){
+                                String roomName = room.getName();
+                                operationDetail.setResName(roomName);
+                            }
+
+                        }
+                    }
+
+//opName
+
+                    DomResOperation domResOperation = new DomResOperation();
+                    domResOperation.setDomId(domId);
+                    domResOperation.setResTypeId(resTypeId);
+                    domResOperation.setOpId(opId);
+                    DomResOperation select = domResOperationMapper.select(domResOperation);
+                    String opName = select.getOpName();
+                    operationDetail.setOpName(opName);
+
+                    operationDetails.add(operationDetail);
 
 
                 }
