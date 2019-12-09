@@ -103,6 +103,34 @@ public class DomUserOperationServiceImpl implements DomUserOperationService{
             //return  resultUniteServiceImp.resultSuccess(domUserOperation); //成功返回值
         }
 
+
+    }
+
+    /**
+     * 批量添加资源授权
+     * @param domUserOperations
+     * @return
+     */
+    @Override
+    public ResultUtils addOps(List<DomUserOperation> domUserOperations) {
+        for(DomUserOperation domUserOperation : domUserOperations) {
+            DomUserOperation domUserOperation1 = domUserOperationMapper.selectByWhole(domUserOperation);
+            if (domUserOperation1 != null) {
+                throw new FailedException(ResponseInfo.ALREADYOPERATION_ERROR.getErrorCode(),
+                        "添加域" + domUserOperation.getDomId() + "下" + "属主" + domUserOperation.getOwnerId() +
+                                "下的此UserOwner" + domUserOperation.getUserOwnerId() + "对资源类型" + domUserOperation.getResTypeId()
+                                + "的实例" + domUserOperation.getResId() + "的资源授权失败，因为" +
+                                ResponseInfo.ALREADYOPERATION_ERROR.getErrorMsg());
+            }
+        }
+        for(DomUserOperation domUserOperation : domUserOperations){
+                domUserOperationMapper.insert(domUserOperation);
+            }
+        ResultUtils resultUtils = new ResultUtils(ResponseInfo.SUCCESS.getErrorCode(),
+                ResponseInfo.SUCCESS.getErrorMsg(),
+                domUserOperations.size()
+        );
+        return resultUtils;
     }
 
     /**
