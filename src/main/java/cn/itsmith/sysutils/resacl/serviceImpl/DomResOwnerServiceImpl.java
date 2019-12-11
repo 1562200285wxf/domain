@@ -23,6 +23,8 @@ public class DomResOwnerServiceImpl implements DomResOwnerService {
     DomResTypeMapper domResTypeMapper;
     @Autowired
     DomOwnerResMapper domOwnerResMapper;
+    @Autowired
+    DomUserOperationMapper domUserOperationMapper;
 
     @Override
     public ResultUtils getAllDomResOwner() {
@@ -157,6 +159,44 @@ public class DomResOwnerServiceImpl implements DomResOwnerService {
             }
         }
         return domResOwnerNode;
+    }
+
+    @Override
+    public ResultUtils getOperationOwners(List<DomResOperationL> domResOperationLS) {
+        Integer domId = domResOperationLS.get(0).getDomId();
+        Integer ownerId = domResOperationLS.get(0).getOwnerId();
+        //根据域id和属主id查询到该属主下的所有成员
+        List<DomResOwner> domResOwners = domResOwnerMapper.selectByPId(domId, ownerId);
+        //遍历操作，剔除拥有该操作的成员
+        for(DomResOperationL domResOperationL : domResOperationLS){
+            DomUserOperation domUserOperation = new DomUserOperation();
+            domUserOperation.setDomId(domResOperationL.getDomId());
+            domUserOperation.setOwnerId(domResOperationL.getOwnerId());
+            domUserOperation.setResTypeId(domResOperationL.getResTypeId());
+            domUserOperation.setOpId(domResOperationL.getOpId());
+            domUserOperation.setResId(domResOperationL.getResId());
+            domUserOperation.setTypes(1);
+            List<DomUserOperation> domUserOperations = domUserOperationMapper.selectUsersOrOwners(domUserOperation);
+            //遍历剔除
+            Iterator<DomResOwner> domResOwnerIterator = domResOwners.iterator();
+            while(domResOwnerIterator.hasNext()){
+                DomResOwner domResOwner = domResOwnerIterator.next();
+                if(domResOwner.getStatus()==0){
+                    domResOwnerIterator.remove();
+                }else{
+                    for(DomUserOperation domUserOperation1 : domUserOperations){
+                        if(domUserOperation1.getUserOwnerId().equals(domResOwner.getOwnerId())){
+                            domResOwnerIterator.remove();
+                        }
+                    }
+                }
+            }
+        }
+        ResultUtils resultUtils = new ResultUtils();
+        resultUtils.setCode(ResponseInfo.SUCCESS.getErrorCode());
+        resultUtils.setMessage(String.format("成功获取属主"));
+        resultUtils.setData(domResOwners);
+        return resultUtils;
     }
 
     /**

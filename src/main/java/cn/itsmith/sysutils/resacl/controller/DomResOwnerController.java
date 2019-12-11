@@ -2,31 +2,39 @@ package cn.itsmith.sysutils.resacl.controller;
 
 import cn.itsmith.sysutils.resacl.common.config.ResponseInfo;
 import cn.itsmith.sysutils.resacl.common.exception.FailedException;
-import cn.itsmith.sysutils.resacl.entities.DomResOwner;
-import cn.itsmith.sysutils.resacl.entities.DomResOwnerA;
-import cn.itsmith.sysutils.resacl.entities.DomResOwnerD;
-import cn.itsmith.sysutils.resacl.entities.DomResOwnerU;
-import cn.itsmith.sysutils.resacl.service.DomOwnerUserService;
-import cn.itsmith.sysutils.resacl.service.DomResOwnerService;
-import cn.itsmith.sysutils.resacl.service.DomainService;
+import cn.itsmith.sysutils.resacl.entities.*;
+import cn.itsmith.sysutils.resacl.service.*;
 import cn.itsmith.sysutils.resacl.utils.ResultUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/domResOwner")
 @Api(tags = "资源属主才做的基础类api文档")
 public class DomResOwnerController {
+    @Value("$checkToken")
+    private String checkToken;
     @Autowired
     DomResOwnerService domResOwnerService;
     @Autowired
     DomOwnerUserService domOwnerUserService;
     @Autowired
     DomainService domainService;
+    @Autowired
+    DomResInstanceService domResInstanceService;
+    @Autowired
+    DomResTypeService domResTypeService;
+    @Autowired
+    DomOwnerResService domOwnerResService;
+    @Autowired
+    DomResOperationService domResOperationService;
 
     //添加域资源属主
     @ApiOperation(value = "添加域资源属主",
@@ -45,10 +53,11 @@ public class DomResOwnerController {
             @ApiImplicitParam(name = "domResOwnerA", value = "域资源属主", required = true, dataType = "DomResOwnerA", paramType = "body")
     })
     @PostMapping("/addDomResOwner")
-    public ResultUtils addDomResOwner(@RequestHeader(value = "Auth", required = true) String Auth, @RequestBody DomResOwnerA domResOwnerA) {
+    public ResultUtils addDomResOwner(@RequestHeader(value = "Auth", required = false) String Auth, @RequestBody DomResOwnerA domResOwnerA) {
         //根据令牌和domain判断请求请求是否正确
         domainService.verify(domResOwnerA.getDomId(), Auth);
         //根据父节点信息查找是否存在父节点的资源属主
+        System.out.println(domResOwnerA);
         if(domResOwnerA.getPId() != 0) {
             if(!domResOwnerService.ownerExist(domResOwnerA.getDomId(),
                     domResOwnerA.getPId()))
@@ -168,6 +177,54 @@ public class DomResOwnerController {
             throw new FailedException(ResponseInfo.GETOWNER_ERROR.getErrorCode(),
                     String.format("域标识为%d的域下不存在标识为%d的属主,获取属主树失败", domId, ownerId));
         return domResOwnerService.getDomResOwnerTree(domId, ownerId);
+    }
+
+    /**
+     * 根据操作的list查出不拥有这些操作的成员
+     * @param Auth
+     * @return
+     */
+    @ApiOperation(value = "根据操作的list查出不拥有这些操作的属主", notes = "针对属主成员的查询操作")
+    @PostMapping(value="/operation-owners")
+    public ResultUtils getOperationOwners(@RequestHeader(value = "Auth", required = true) String Auth, @RequestBody List<DomResOperationL> domResOperationLS) {
+        for(DomResOperationL domResOperationL : domResOperationLS){
+            //根据令牌和domain判断请求请求是否正确
+            domainService.verify(domResOperationL.getDomId(), Auth);
+            //根据属主标识查找是否存在该属主
+            if(!domResOwnerService.ownerExist(domResOperationL.getDomId(),
+                    domResOperationL.getOwnerId()))
+                throw new FailedException(ResponseInfo.GETOWNER_ERROR.getErrorCode(),
+                        String.format("域标识为%d的域下不存在标识为%d的属主",
+                                domResOperationL.getDomId(), domResOperationL.getOwnerId()));
+
+            //根据资源种类标识查找是否存在该资源种类
+            if(!domResTypeService.domResTypeExist(domResOperationL.getDomId(),
+                    domResOperationL.getResTypeId()))
+                throw new FailedException(ResponseInfo.GETRESTYPE_ERROR.getErrorCode(),
+                        String.format("域标识为%d的域下标识为%d的资源种类不存在,添加失败",
+                                domResOperationL.getDomId(), domResOperationL.getResTypeId()));
+
+            //根据域id，属主id和资源类型id查找此属主是否拥有该资源种类
+            if(!domOwnerResService.ownerResExist(domResOperationL.getDomId(),
+                    domResOperationL.getOwnerId(), domResOperationL.getResTypeId()))
+                throw new FailedException(ResponseInfo.GETOWNERRES_ERROR.getErrorCode(),
+                        String.format("添加的实例中域标识为%d的域下标识为%d的资源属主不存在标识为%d的资源种类,添加失败",
+                                domResOperationL.getDomId(), domResOperationL.getOwnerId(), domResOperationL.getResTypeId()));
+            if(!domResOperationService.resOperationExist(domResOperationL.getDomId(),
+                    domResOperationL.getResTypeId(), domResOperationL.getOpId()))
+                throw new FailedException(ResponseInfo.GETRESOPERATION_ERROR.getErrorCode(),
+                        String.format("不存在标识为%d的域下的标识为%d的资源种类的标识为%d的资源可用权限",
+                                domResOperationL.getDomId(), domResOperationL.getResTypeId(), domResOperationL.getOpId()));
+            //判断是否存在实例
+            if(!domResInstanceService.resInstanceExist(domResOperationL.getDomId(), domResOperationL.getOwnerId(),
+                    domResOperationL.getResTypeId(), domResOperationL.getResId()))
+                throw new FailedException(ResponseInfo.GETRESINTANCE_ERROR.getErrorCode(),
+                        String.format("不存在域标识为%d的域下标识为%d的资源属主中标识为%d的资源种类的标识为%d的实例",
+                                domResOperationL.getDomId(), domResOperationL.getOwnerId(),
+                                domResOperationL.getResTypeId(), domResOperationL.getResId()));
+        }
+        return domResOwnerService.getOperationOwners(domResOperationLS);
+
     }
 
 }
