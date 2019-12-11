@@ -8,10 +8,11 @@
         <result property="ownerId" column="ownerid"/>
         <result property="opId" column="opid"/>
         <result property="userOwnerId" column="userownerid"/>
+        <result property="types" column="types"/>
         <result property="status" column="status"/>
     </resultMap>
     <sql id="Base_Column_List">
-        domid, restypeid, resid, ownerid, opid, userownerid, status
+        domid, restypeid, resid, ownerid, opid, userownerid, types, status
     </sql>
 
     <!--根据资源实例标识查询-->
@@ -50,7 +51,16 @@
         and resid = #{resId}
     </select>
 
-
+    <select id="selectUsersOrOwners" resultType="cn.itsmith.sysutils.resacl.entities.DomUserOperation">
+        SELECT * from t_dom_user_operation
+        where domid = #{domId}
+        and restypeid = #{resTypeId}
+        and resid = #{resId}
+        and ownerid = #{ownerId}
+        and opid = #{opId}
+        AND types = #{types}
+        and status=1
+    </select>
     <!--selectOps单纯用户拥有的ops-->
     <select id="selectOps" resultType="cn.itsmith.sysutils.resacl.entities.DomUserOperation">
         SELECT * from t_dom_user_operation
@@ -71,6 +81,7 @@
         AND opid = #{opId}
         and userownerid = #{userOwnerId}
         AND Types = #{types}
+        and status=1
     </select>
     <insert id="insert" useGeneratedKeys="true" keyProperty="id" >
         insert into t_dom_user_operation(domid,restypeid,resid,ownerid,opid,userownerid,Types,status)

@@ -7,8 +7,9 @@ import cn.itsmith.sysutils.resacl.dao.DomResOwnerMapper;
 import cn.itsmith.sysutils.resacl.dao.DomainMapper;
 import cn.itsmith.sysutils.resacl.entities.DomOwnerUser;
 import cn.itsmith.sysutils.resacl.entities.DomOwnerUserA;
-import cn.itsmith.sysutils.resacl.service.DomResOwnerService;
-import cn.itsmith.sysutils.resacl.service.UserService;
+import cn.itsmith.sysutils.resacl.entities.DomResInstanceA;
+import cn.itsmith.sysutils.resacl.entities.DomResOperationL;
+import cn.itsmith.sysutils.resacl.service.*;
 import cn.itsmith.sysutils.resacl.serviceImpl.DomOwnerUserServiceImpl;
 import cn.itsmith.sysutils.resacl.utils.ResultUtils;
 import io.swagger.annotations.Api;
@@ -32,6 +33,16 @@ public class UserController {
     DomResOwnerMapper ownerMapper;
     @Autowired
     DomResOwnerService domResOwnerService1;
+    @Autowired
+    DomResInstanceService domResInstanceService;
+    @Autowired
+    DomResTypeService domResTypeService;
+    @Autowired
+    DomOwnerResService domOwnerResService;
+    @Autowired
+    DomainService domainService;
+    @Autowired
+    DomResOperationService domResOperationService;
 
 @Autowired
 UserService userService;
@@ -217,6 +228,54 @@ public ResultUtils queryUserTree(@RequestParam(value="domId",required = true) In
         }else {
             return userService.queryUsers(domOwnerUser);
         }
+    }
+
+    /**
+     * 根据操作的list查出不拥有这些操作的成员
+     * @param Auth
+     * @return
+     */
+    @ApiOperation(value = "根据操作的list查出不拥有这些操作的成员", notes = "针对属主成员的查询操作")
+    @PostMapping(value="/operation-users")
+    public ResultUtils getOperationUsers(@RequestHeader(value = "Auth", required = true) String Auth, @RequestBody List<DomResOperationL> domResOperationLS) {
+        for(DomResOperationL domResOperationL : domResOperationLS){
+            //根据令牌和domain判断请求请求是否正确
+            domainService.verify(domResOperationL.getDomId(), Auth);
+            //根据属主标识查找是否存在该属主
+            if(!domResOwnerService1.ownerExist(domResOperationL.getDomId(),
+                    domResOperationL.getOwnerId()))
+                throw new FailedException(ResponseInfo.GETOWNER_ERROR.getErrorCode(),
+                        String.format("域标识为%d的域下不存在标识为%d的属主",
+                                domResOperationL.getDomId(), domResOperationL.getOwnerId()));
+
+            //根据资源种类标识查找是否存在该资源种类
+            if(!domResTypeService.domResTypeExist(domResOperationL.getDomId(),
+                    domResOperationL.getResTypeId()))
+                throw new FailedException(ResponseInfo.GETRESTYPE_ERROR.getErrorCode(),
+                        String.format("域标识为%d的域下标识为%d的资源种类不存在,添加失败",
+                                domResOperationL.getDomId(), domResOperationL.getResTypeId()));
+
+            //根据域id，属主id和资源类型id查找此属主是否拥有该资源种类
+            if(!domOwnerResService.ownerResExist(domResOperationL.getDomId(),
+                    domResOperationL.getOwnerId(), domResOperationL.getResTypeId()))
+                throw new FailedException(ResponseInfo.GETOWNERRES_ERROR.getErrorCode(),
+                        String.format("添加的实例中域标识为%d的域下标识为%d的资源属主不存在标识为%d的资源种类,添加失败",
+                                domResOperationL.getDomId(), domResOperationL.getOwnerId(), domResOperationL.getResTypeId()));
+            if(!domResOperationService.resOperationExist(domResOperationL.getDomId(),
+                    domResOperationL.getResTypeId(), domResOperationL.getOpId()))
+                throw new FailedException(ResponseInfo.GETRESOPERATION_ERROR.getErrorCode(),
+                        String.format("不存在标识为%d的域下的标识为%d的资源种类的标识为%d的资源可用权限",
+                                domResOperationL.getDomId(), domResOperationL.getResTypeId(), domResOperationL.getOpId()));
+            //判断是否存在实例
+            if(!domResInstanceService.resInstanceExist(domResOperationL.getDomId(), domResOperationL.getOwnerId(),
+                    domResOperationL.getResTypeId(), domResOperationL.getResId()))
+                throw new FailedException(ResponseInfo.GETRESINTANCE_ERROR.getErrorCode(),
+                        String.format("不存在域标识为%d的域下标识为%d的资源属主中标识为%d的资源种类的标识为%d的实例",
+                                domResOperationL.getDomId(), domResOperationL.getOwnerId(),
+                                domResOperationL.getResTypeId(), domResOperationL.getResId()));
+        }
+        return userService.getOperationUsers(domResOperationLS);
+
     }
 
     /**

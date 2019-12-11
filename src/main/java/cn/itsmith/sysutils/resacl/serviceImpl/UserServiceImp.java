@@ -207,6 +207,53 @@ public class UserServiceImp implements UserService {
     }
 
     /**
+     * 根据前台传来的操作的list，从资源授权表中查出拥有这些权限的人，再在用户表中剔除这些人
+     * @param domResOperationLS
+     * @return
+     */
+    @Override
+    public ResultUtils getOperationUsers(List<DomResOperationL> domResOperationLS) {
+        Integer domId = domResOperationLS.get(0).getDomId();
+        Integer ownerId = domResOperationLS.get(0).getOwnerId();
+        //根据域id和属主id查询到该属主下的所有成员
+        List<DomOwnerUser> domOwnerUsers = userMapper.queryUserBydomowner(domId, ownerId);
+        if (domOwnerUsers != null) {
+            for (DomOwnerUser user :
+                    domOwnerUsers) {
+                Integer userId = user.getUserId();
+                String userName = userMapper.queryUserName(userId);
+                user.setUserName(userName);
+            }
+        }
+         //遍历操作，剔除拥有该操作的成员
+        for(DomResOperationL domResOperationL : domResOperationLS){
+            DomUserOperation domUserOperation = new DomUserOperation();
+            domUserOperation.setDomId(domResOperationL.getDomId());
+            domUserOperation.setOwnerId(domResOperationL.getOwnerId());
+            domUserOperation.setResTypeId(domResOperationL.getResTypeId());
+            domUserOperation.setOpId(domResOperationL.getOpId());
+            domUserOperation.setResId(domResOperationL.getResId());
+            domUserOperation.setTypes(0);
+            List<DomUserOperation> domUserOperations = domUserOperationMapper.selectUsersOrOwners(domUserOperation);
+            //遍历剔除
+            Iterator<DomOwnerUser> domOwnerUserIterator = domOwnerUsers.iterator();
+            while(domOwnerUserIterator.hasNext()){
+                DomOwnerUser domOwnerUser = domOwnerUserIterator.next();
+                for(DomUserOperation domUserOperation1 : domUserOperations){
+                    if(domUserOperation1.getUserOwnerId().equals(domOwnerUser.getUserId())){
+                        domOwnerUserIterator.remove();
+                    }
+                }
+            }
+        }
+        ResultUtils resultUtils = new ResultUtils();
+        resultUtils.setCode(ResponseInfo.SUCCESS.getErrorCode());
+        resultUtils.setMessage(String.format("成功获取成员"));
+        resultUtils.setData(domOwnerUsers);
+        return resultUtils;
+    }
+
+    /**
      * 查询特定属主下不存在的基本Users
      * @param domOwnerUser
      * @return

@@ -12,6 +12,12 @@ public interface DomUserOperationMapper {
     int updateStatus(DomUserOperation domUserOperation);
     List<DomUserOperation> selectByOpId(int domId, int resTypeId, int opId);
 
+    /**
+     * 根据域、属主、资源种类、资源实例查询拥有的成员或属主
+     * @param domUserOperation
+     * @return
+     */
+    List<DomUserOperation> selectUsersOrOwners(DomUserOperation domUserOperation);
 
     List<DomUserOperation> selectByResId(@Param("domId") Integer domId,@Param("resId") Integer resId);
     DomUserOperation selectByWhole(DomUserOperation domUserOperation);

@@ -1,6 +1,7 @@
 package cn.itsmith.sysutils.resacl.service;
 
 import cn.itsmith.sysutils.resacl.entities.DomOwnerUser;
+import cn.itsmith.sysutils.resacl.entities.DomResOperationL;
 import cn.itsmith.sysutils.resacl.utils.ResultUtils;
 
 import java.util.List;
@@ -15,6 +16,7 @@ public interface UserService {
     ResultUtils concelAdmin(DomOwnerUser domOwnerUser);
     //查询在特定属主下的domUsers
     ResultUtils queryUsers(DomOwnerUser domOwnerUser);
+    ResultUtils getOperationUsers(List<DomResOperationL> domResOperationLS);
 
     /**
      * 用户添加模块1
