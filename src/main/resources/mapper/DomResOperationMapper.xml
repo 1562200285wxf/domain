@@ -39,9 +39,13 @@
     </update>
 
     <!--修改资源可用权限描述-->
-    <update id="updateOpDes" parameterType="cn.itsmith.sysutils.resacl.entities.DomResOperation">
+    <update id="updateOp" parameterType="cn.itsmith.sysutils.resacl.entities.DomResOperation">
         update t_dom_res_operation
         <set>
+            <if test="opName != null">
+                opname = #{opName}
+            </if>
+            ,
             <if test="opDes != null">
                 opdes = #{opDes}
             </if>

@@ -11,7 +11,7 @@ public interface DomResOperationMapper {
     int insert(DomResOperation domResOperation);
     int delete(DomResOperation domResOperation);
     int updateStatus(DomResOperation domResOperation);
-    int updateOpDes(DomResOperation domResOperation);
+    int updateOp(DomResOperation domResOperation);
     int updateIsExtend(DomResOperation domResOperation);
     int updateIsCommon(DomResOperation domResOperation);
     List<DomResOperation> selectById(@Param("domId")int domId, @Param("resTypeId") int resTypeId);

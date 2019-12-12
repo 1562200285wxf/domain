@@ -90,7 +90,7 @@ public class DomResOperationServiceImpl implements DomResOperationService {
     @Override
     public ResultUtils updateOpDes(DomResOperation domResOperation) {
         ResultUtils resultUtils = new ResultUtils();
-        if(domResOperationMapper.updateOpDes(domResOperation)==1){
+        if(domResOperationMapper.updateOp(domResOperation)==1){
             resultUtils.setCode(ResponseInfo.SUCCESS.getErrorCode());
             resultUtils.setMessage(String.format("成功修改标识为%d的域下标识为%d的资源种类的标识为%d的可用权限的描述为%s",
                     domResOperation.getDomId(), domResOperation.getResTypeId(),

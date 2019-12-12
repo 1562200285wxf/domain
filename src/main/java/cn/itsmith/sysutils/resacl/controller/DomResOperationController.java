@@ -157,7 +157,7 @@ public class DomResOperationController {
             @ApiImplicitParam(name = "Auth", value = "域令牌", required = false, dataType = "String", paramType = "header"),
             @ApiImplicitParam(name = "domResOperationU", value = "域资源属主", required = true, dataType = "DomResOperationU", paramType = "body")
     })
-    @PutMapping("/operation-des")
+    @PutMapping("/operation")
     public ResultUtils modifyOpDes(@RequestHeader(value = "Auth", required = true) String Auth, @RequestBody DomResOperationU domResOperationU) {
         //根据令牌和domain判断请求请求是否正确
         domainService.verify(domResOperationU.getDomId(), Auth);
@@ -170,6 +170,7 @@ public class DomResOperationController {
         domResOperation.setDomId(domResOperationU.getDomId());
         domResOperation.setResTypeId(domResOperationU.getResTypeId());
         domResOperation.setOpId(domResOperationU.getOpId());
+        domResOperation.setOpName(domResOperationU.getOpName());
         domResOperation.setOpDes(domResOperationU.getOpDes());
         return domResOperationService.updateOpDes(domResOperation);
     }

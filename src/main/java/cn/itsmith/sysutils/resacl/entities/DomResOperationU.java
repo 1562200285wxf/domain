@@ -7,5 +7,6 @@ public class DomResOperationU {
     Integer domId;
     Integer resTypeId;
     Integer opId;
+    String opName;
     String opDes;
 }
