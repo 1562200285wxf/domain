@@ -7,6 +7,16 @@ public class ChangeResourceTypeDes {
 
     private String restypedes;
 
+    private String resname;
+
+    public String getResname() {
+        return resname;
+    }
+
+    public void setResname(String resname) {
+        this.resname = resname;
+    }
+
     public Integer getRestypeid() {
         return restypeid;
     }

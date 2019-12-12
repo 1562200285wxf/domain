@@ -2,10 +2,7 @@ package cn.itsmith.sysutils.resacl.controller;
 
 import cn.itsmith.sysutils.resacl.common.config.ResponseInfo;
 import cn.itsmith.sysutils.resacl.common.exception.FailedException;
-import cn.itsmith.sysutils.resacl.common.utilss.EncryptUtil;
-import cn.itsmith.sysutils.resacl.common.utilss.TokenUtil;
-import cn.itsmith.sysutils.resacl.common.utilss.UpdateDomainDes;
-import cn.itsmith.sysutils.resacl.common.utilss.addDomain;
+import cn.itsmith.sysutils.resacl.common.utilss.*;
 import cn.itsmith.sysutils.resacl.dao.DomainMapper;
 import cn.itsmith.sysutils.resacl.entities.Domain;
 import cn.itsmith.sysutils.resacl.service.DomainService;
@@ -72,7 +69,7 @@ public class DomainController {
             domain.setDomToken(Token);
             domainMapper.updateByPrimaryKeySelective(domain);
             resultUtils.setCode(ResponseInfo.SUCCESS_IS.getErrorCode());
-            resultUtils.setMessage(String.format("成功为标识为%d的域下添加域token",
+            resultUtils.setMessage(String.format("当前标识为%d的域的域token是",
                     domid)+Token);
             resultUtils.setData(domain.getDomId());
             return resultUtils;
@@ -90,8 +87,8 @@ public class DomainController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "domid", value = "域id", dataType = "Integer",required = false,paramType = "query"),
     })
-    @RequestMapping(value="/queryDomain",method = RequestMethod.GET)
-    public ResultUtils queryDomain(Integer domid) {
+    @GetMapping("/getOwnerResInstance/{domid}")
+    public ResultUtils queryDomain(@PathVariable(value = "domid") int domid) {
         ResultUtils resultUtils = new ResultUtils();
         Domain domain = domainMapper.selectByPrimaryKey(domid);
         if(domain == null){
@@ -191,6 +188,26 @@ public class DomainController {
             resultUtils.setMessage("成功获取所有域");
             resultUtils.setData(list);
         }
+        return resultUtils;
+    }
+
+
+    @ApiOperation(value = "查询域的token")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "domToken", value = "domToken", dataType = "DomToken",required = false,paramType = "body"),
+    })
+    @RequestMapping(value="/getDomToken",method = RequestMethod.POST)
+    public ResultUtils getDomToken(@RequestBody DomToken domToken){
+        ResultUtils resultUtils = new ResultUtils();
+        String encrypt = "domainmiyao";
+        if(domToken.getEncrypt().equals(encrypt)){
+            resultUtils.setCode(ResponseInfo.SUCCESS_IS.getErrorCode());
+            resultUtils.setMessage("成功获取域Token");
+            resultUtils.setData(domainMapper.getDomToken(domToken.getDomId()));
+            return resultUtils;
+        }
+        resultUtils.setCode(ResponseInfo.FALSE_IS.getErrorCode());
+        resultUtils.setMessage("no成功获取域Token");
         return resultUtils;
     }
 

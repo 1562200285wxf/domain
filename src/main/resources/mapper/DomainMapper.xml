@@ -28,16 +28,23 @@
   </select>
 
     <!--    wang-->
+    <!--根据id查询域信息-->
+    <select id="getDomToken"  resultMap="Domain">
+        select
+        <include refid="Base_Column_List"/>
+        from t_domain
+        WHERE domid=#{domId} and status=1
+    </select>
     <select id="getAllDomain"  resultMap="Domain">
         select *
         from t_domain
         WHERE status=1
     </select>
-    <select id="selectByPrimaryKey" resultMap="Domain" parameterType="java.lang.Integer" >
+    <select id="selectByPrimaryKey" resultMap="Domain" >
         select
         <include refid="Base_Column_List" />
         from t_domain
-        where domid = #{domId,jdbcType=INTEGER}
+        where domid = #{domId}
         and status = 1
     </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >

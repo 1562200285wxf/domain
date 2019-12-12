@@ -73,7 +73,6 @@ public class DomResTypeServiceImpl implements DomResTypeService {
             resultUtils.setMessage("域标识为"+domResType.getDomId()+"的不存在");
             return resultUtils;
         }
-
         if(domResTypeMapper.getDomResTypeByResTypeId(domResType.getDomId(),domResType.getPId())==null ){
             resultUtils.setCode(ResponseInfo.FALSE_IS.getErrorCode());
             resultUtils.setMessage(String.format("种类为标识为%d的种类的父级节点%d不存在,添加失败",domResType.getResTypeId(),domResType.getPId()));

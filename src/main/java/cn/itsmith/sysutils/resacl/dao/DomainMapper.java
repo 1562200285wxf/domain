@@ -27,4 +27,6 @@ public interface DomainMapper {
     int updateByPrimaryKey(Domain record);
 
     List<Domain> getAllDomain();
+
+    Domain getDomToken(int domId);
 }

@@ -60,6 +60,8 @@ public class DomResTypeController {
         domResType.setDomId(changeResourceTypeDes.getDomid());
         domResType.setResTypeDes(changeResourceTypeDes.getRestypedes());
         domResType.setResTypeId(changeResourceTypeDes.getRestypeid());
+        domResType.setResName(changeResourceTypeDes.getResname());
+
         ResultUtils result = resTypeServiceImpl.changeResourceTypeDes(domResType);
         return result;
 
@@ -96,4 +98,6 @@ public class DomResTypeController {
         domResTree1.setResTypeId(0);
         return resTypeServiceImpl.getDomResTree(domResTree1.getDomid(),domResTree1.getResTypeId());
     }
+
+
 }

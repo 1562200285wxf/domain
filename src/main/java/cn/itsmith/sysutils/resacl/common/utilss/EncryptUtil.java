@@ -12,7 +12,7 @@ import java.security.SecureRandom;
 
 public class EncryptUtil {
 
-    private static final String KEY = "myMw6qPt&3AD";
+    private static final String KEY = "domainmiyao";
     private static final Logger LOGGER = LoggerFactory.getLogger(EncryptUtil.class);
 
     public static void main(String[] args) throws Exception {

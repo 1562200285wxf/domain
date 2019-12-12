@@ -96,7 +96,7 @@
         <include refid="Base_Column_List" />
         from t_dom_res_type
         where restypeid = #{resTypeId,jdbcType=INTEGER}
-        and status = #{1,jdbcType=INTEGER}
+        and status = 1
     </select>
 
     <select id="getDomResTypeByResTypeId" resultMap="DomResType" parameterType="java.lang.Integer" >
@@ -191,7 +191,7 @@
                 pid = #{pId,jdbcType=INTEGER},
             </if>
             <if test="resName != null" >
-                #{resName,jdbcType=CHAR},
+                resname= #{resName,jdbcType=CHAR},
             </if>
             <if test="status != null" >
                 status = #{status,jdbcType=INTEGER},
