@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/domResOwner")
 @Api(tags = "资源属主才做的基础类api文档")
 public class DomResOwnerController {
     @Value("$checkToken")
@@ -52,7 +51,7 @@ public class DomResOwnerController {
             @ApiImplicitParam(name = "Auth", value = "域令牌", required = false, dataType = "String", paramType = "header"),
             @ApiImplicitParam(name = "domResOwnerA", value = "域资源属主", required = true, dataType = "DomResOwnerA", paramType = "body")
     })
-    @PostMapping("/addDomResOwner")
+    @PostMapping("/owner")
     public ResultUtils addDomResOwner(@RequestHeader(value = "Auth", required = false) String Auth, @RequestBody DomResOwnerA domResOwnerA) {
         //根据令牌和domain判断请求请求是否正确
         domainService.verify(domResOwnerA.getDomId(), Auth);
@@ -89,8 +88,8 @@ public class DomResOwnerController {
             @ApiImplicitParam(name = "Auth", value = "域令牌", required = false, dataType = "String", paramType = "header"),
             @ApiImplicitParam(name = "domResOwnerU", value = "域资源属主", required = true, dataType = "DomResOwnerU", paramType = "body")
     })
-    @PostMapping("/modifyOwnerDes")
-    public ResultUtils modifyOwnerDes(@RequestHeader(value = "Auth", required = true) String Auth, @RequestBody DomResOwnerU domResOwnerU) {
+    @PutMapping("/owner")
+    public ResultUtils modifyOwner(@RequestHeader(value = "Auth", required = true) String Auth, @RequestBody DomResOwnerU domResOwnerU) {
         //根据令牌和domain判断请求请求是否正确
         domainService.verify(domResOwnerU.getDomId(), Auth);
         //先根据资源属主标识查找是否存在此资源属主
@@ -102,6 +101,7 @@ public class DomResOwnerController {
         DomResOwner domResOwner = new DomResOwner();
         domResOwner.setDomId(domResOwnerU.getDomId());
         domResOwner.setOwnerId(domResOwnerU.getOwnerId());
+        domResOwner.setOwnerName(domResOwnerU.getOwnerName());
         domResOwner.setOwnerDes(domResOwnerU.getOwnerDes());
         return domResOwnerService.updateOwnerDes(domResOwner);
     }
@@ -128,7 +128,7 @@ public class DomResOwnerController {
             @ApiImplicitParam(name = "Auth", value = "域令牌", required = false, dataType = "String", paramType = "header"),
             @ApiImplicitParam(name = "domResOwnerD", value = "域资源属主", required = true, dataType = "DomResOwnerD", paramType = "body")
     })
-    @DeleteMapping("/deleteDomResOwner")
+    @DeleteMapping("/owner")
     public ResultUtils deleteDomResOwner(@RequestHeader(value = "Auth", required = true) String Auth, @RequestBody DomResOwnerD domResOwnerD){
         /**
          *
@@ -167,7 +167,7 @@ public class DomResOwnerController {
             @ApiImplicitParam(name = "domId", value = "域标识", required = true, dataType = "int", paramType = "path"),
             @ApiImplicitParam(name = "ownerId", value = "资源属主标识", required = true, dataType = "int", paramType = "query"),
     })
-    @GetMapping("/getDomResOwnerTree/{domId}")
+    @GetMapping("/owner-tree/{domId}")
     public ResultUtils getDomResOwnerTree(@RequestHeader(value = "Auth", required = true) String Auth, @PathVariable(value = "domId") int domId, @RequestParam(value = "ownerId") int ownerId) {
         //根据令牌和domain判断请求请求是否正确
         domainService.verify(domId, Auth);

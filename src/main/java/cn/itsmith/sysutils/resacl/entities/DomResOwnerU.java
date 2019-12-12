@@ -8,5 +8,6 @@ import lombok.Data;
 public class DomResOwnerU {
         Integer domId;
         Integer ownerId;
+        String ownerName;
         String ownerDes;
 }

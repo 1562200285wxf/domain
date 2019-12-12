@@ -15,7 +15,7 @@ public interface DomResOwnerMapper {
    DomResOwner selectById(@Param("domId") int domId, @Param("ownerId") int ownerId);
 
    int insert(DomResOwner domResOwner);
-   int updateOwnerDes(@Param("ownerId") int ownerId, @Param("ownerDes") String ownerDes);
+   int updateOwner(DomResOwner domResOwner);
    int deleteById(int ownerId);
    int updateStatus(DomResOwner domResOwner);
    List<DomResOwner> selectByPId(@Param("domId") int domId, @Param("pId") int pId);

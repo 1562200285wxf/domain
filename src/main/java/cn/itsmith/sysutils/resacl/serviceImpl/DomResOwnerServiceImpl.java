@@ -66,7 +66,7 @@ public class DomResOwnerServiceImpl implements DomResOwnerService {
     @Override
     public ResultUtils updateOwnerDes(DomResOwner domResOwner) {
         ResultUtils resultUtils = new ResultUtils();
-        if(domResOwnerMapper.updateOwnerDes(domResOwner.getOwnerId(), domResOwner.getOwnerDes())==1){
+        if(domResOwnerMapper.updateOwner(domResOwner)==1){
             resultUtils.setCode(ResponseInfo.SUCCESS.getErrorCode());
             resultUtils.setMessage(String.format("成功修改域标识为%d域下的标识为%d的属主描述为%s",
                     domResOwner.getDomId(), domResOwner.getOwnerId(), domResOwner.getOwnerDes()));

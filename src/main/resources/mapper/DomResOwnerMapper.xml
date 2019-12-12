@@ -38,14 +38,18 @@
     </insert>
 
     <!--修改资源属主描述-->
-    <update id="updateOwnerDes" >
+    <update id="updateOwner" parameterType="cn.itsmith.sysutils.resacl.entities.DomResOwner">
         update t_dom_res_owner
         <set>
+            <if test="ownerName != null">
+                ownername = #{ownerName}
+            </if>
+            ,
             <if test="ownerDes != null">
-                ownerdes = #{ownerDes, jdbcType=VARCHAR}
+               ownerdes = #{ownerDes}
             </if>
         </set>
-        where ownerid = #{ownerId, jdbcType=INTEGER}
+        where ownerid = #{ownerId}
     </update>
     <!--    根据属主标识删除属主-->
     <delete id="deleteById" parameterType="int">
