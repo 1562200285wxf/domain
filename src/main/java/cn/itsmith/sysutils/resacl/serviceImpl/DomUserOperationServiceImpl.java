@@ -2,10 +2,7 @@ package cn.itsmith.sysutils.resacl.serviceImpl;
 
 import cn.itsmith.sysutils.resacl.common.config.ResponseInfo;
 import cn.itsmith.sysutils.resacl.common.exception.FailedException;
-import cn.itsmith.sysutils.resacl.dao.DomResOperationMapper;
-import cn.itsmith.sysutils.resacl.dao.DomResTypeMapper;
-import cn.itsmith.sysutils.resacl.dao.DomUserOperationMapper;
-import cn.itsmith.sysutils.resacl.dao.InstanceMapper;
+import cn.itsmith.sysutils.resacl.dao.*;
 import cn.itsmith.sysutils.resacl.entities.*;
 
 import cn.itsmith.sysutils.resacl.service.DomUserOperationService;
@@ -22,6 +19,16 @@ public class DomUserOperationServiceImpl implements DomUserOperationService{
     @Autowired
     DomUserOperationMapper domUserOperationMapper;
 
+    @Autowired
+    DomResOwnerMapper domResOwnerMapper;
+
+    @Autowired
+    DomOwnerResMapper domOwnerResMapper;
+
+    @Autowired
+    DomUserOperationServiceImpl domUserOperationServiceImpl;
+
+
     ResultUniteServiceImp resultUniteServiceImp = new ResultUniteServiceImp();
 @Autowired
     DomResTypeMapper domResTypeMapper;
@@ -30,6 +37,7 @@ public class DomUserOperationServiceImpl implements DomUserOperationService{
     InstanceMapper instanceMapper;
 @Autowired
 DomResOperationMapper domResOperationMapper;
+
     @Override
     public ResultUtils selectOps(DomUserOperation domUserOperation) {
         Integer domId = domUserOperation.getDomId();
@@ -195,4 +203,97 @@ DomResOperationMapper domResOperationMapper;
             return  resultUniteServiceImp.resultSuccess(domUserOperation2); //成功返回值
         }
     }
-}
+
+    //检查资源授权--是特定人是否拥有特定资源种类的
+    //1 是否可继承  2是否是通用  3是否是自己的权限
+    @Override
+    public ResultUtils checktOps(DomUserOperation domUserOperation){
+        ResultUtils resultUtils = new ResultUtils();
+        String resultMessage = null;
+       Integer domId = domUserOperation.getDomId();
+        DomUserOperation domUserOperationTest;
+
+       //直接进行查询，是否有该权限
+        domUserOperationTest = domUserOperationMapper.checkOpernationByDomUserOperation(domUserOperation);
+       if(domUserOperationTest!=null){
+            resultMessage =  "检查资源授权成功，域"+domUserOperation.getDomId()+"下的属主"+
+                   domUserOperation.getOwnerId()+"下成员"+domUserOperation.getUserOwnerId()+
+                   "有资源类型为"+domUserOperation.getResTypeId()+"，实例为"+domUserOperation.getResId()+
+                   "资源授权记录";
+           resultUtils.setCode(ResponseInfo.SUCCESS_IS.getErrorCode());
+           resultUtils.setMessage(resultMessage);
+           return resultUtils;
+       }
+       // 检查通用或者继承权限
+        if(domUserOperationTest == null){
+            //通用性检查
+            if(domUserOperationServiceImpl.isCommon(domUserOperation)) {
+                resultMessage = "检查资源授权成功，域" + domUserOperation.getDomId() + "下的属主" +
+                        domUserOperation.getOwnerId() + "下成员" + domUserOperation.getUserOwnerId() +
+                        "有资源类型为" + domUserOperation.getResTypeId() + "，实例为" + domUserOperation.getResId() +
+                        "资源授权记录";
+                resultUtils.setCode(ResponseInfo.SUCCESS_IS.getErrorCode());
+                resultUtils.setMessage(resultMessage);
+            }
+            return resultUtils;
+        }
+
+
+        resultMessage = "检查资源授权失败，域" + domUserOperation.getDomId() + "下的属主" +
+                domUserOperation.getOwnerId() + "下成员" + domUserOperation.getUserOwnerId() +
+                "不具备资源类型为" + domUserOperation.getResTypeId() + "，实例为" + domUserOperation.getResId() +
+                "资源授权";
+        resultUtils.setCode(ResponseInfo.OPERATION_NOT.getErrorCode());
+        resultUtils.setMessage(resultMessage);
+        return resultUtils;
+    }
+
+    //如果资源属组拥有资源种类，并且该种类的某种权限是可以通用
+    boolean isCommon(DomUserOperation domUserOperation){
+        //先检查该资源权限是否在域内是通用的
+        Integer domId = domUserOperation.getDomId();
+        Integer resTypeId = domUserOperation.getResTypeId();
+        Integer ownerId = domUserOperation.getOwnerId();
+        Integer type = domUserOperation.getTypes();
+        Integer uid = domUserOperation.getUserOwnerId();
+
+        DomResOperation domResOperationTest = null;
+        domResOperationTest.setOpId(domUserOperation.getOpId());
+        domResOperationTest.setResTypeId(domUserOperation.getResTypeId());
+        domResOperationTest.setDomId(domUserOperation.getDomId());
+        DomResOperation domResOperationCommon = domResOperationMapper.select(domResOperationTest);
+        if(domResOperationCommon == null){
+            return false;
+        }
+
+        //检查属主是否拥有所在域的该资源种类
+        //如果参数是用户ID，则进行迭代属主（原始参数的ownerid）
+        if(type == 0) {
+            do {
+                if (domResOperationCommon != null) {
+                    if (domOwnerResMapper.selectById(domId, ownerId, resTypeId) != null) {
+                        return true;
+                    }
+                }
+                if (domResOperationCommon == null) {
+                    ownerId = domResOwnerMapper.selectById(domId, ownerId).getPId();
+                }
+            } while (ownerId == 0);
+        }
+        //如果参数是属主id，
+        if(type == 1){
+            do {
+                if (domResOperationCommon != null) {
+                    if (domOwnerResMapper.selectById(domId, uid, resTypeId) != null) {
+                        return true;
+                    }
+                }
+                if (domResOperationCommon == null) {
+                    ownerId = domResOwnerMapper.selectById(domId, ownerId).getPId();
+                }
+            } while (ownerId == 0);
+        }
+            return false;
+    }
+
+    }

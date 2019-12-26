@@ -11,4 +11,6 @@ public interface DomUserOperationService {
     ResultUtils addOps(List<DomUserOperation> domUserOperations);
     ResultUtils delOp(DomUserOperation domUserOperation);
     ResultUtils selectOps(DomUserOperation domUserOperation);
+
+    ResultUtils checktOps(DomUserOperation domUserOperation);
 }

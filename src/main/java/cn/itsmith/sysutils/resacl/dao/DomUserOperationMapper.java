@@ -19,6 +19,9 @@ public interface DomUserOperationMapper {
      */
     List<DomUserOperation> selectUsersOrOwners(DomUserOperation domUserOperation);
 
+    //查询单个用户是否用于权限
+    DomUserOperation  checkOpernationByDomUserOperation(DomUserOperation domUserOperation);
+
     List<DomUserOperation> selectByResId(@Param("domId") Integer domId,@Param("resId") Integer resId);
     DomUserOperation selectByWhole(DomUserOperation domUserOperation);
     List<DomUserOperation> selectOps(DomUserOperation domUserOperation);
