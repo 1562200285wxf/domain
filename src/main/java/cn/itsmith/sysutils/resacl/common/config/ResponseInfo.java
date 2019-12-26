@@ -41,6 +41,7 @@ public enum ResponseInfo {
     DOMAIN_NOT(2002,"域不存在"),
     SUCCESS_IS(2003,"操作成功"),
     FALSE_IS(2004,"操作失败"),
+    OPERATION_NOT(2004,"该资源的可用权限对于该uid不存在"),
 
     ResType_IS(2005,"域存在"),
     ResType_NOT(2005,"域存在"),
