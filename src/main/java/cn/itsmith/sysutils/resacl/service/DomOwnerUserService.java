@@ -4,7 +4,7 @@ import cn.itsmith.sysutils.resacl.entities.*;
 import cn.itsmith.sysutils.resacl.utils.ResultUtils;
 
 public interface DomOwnerUserService {
-//    boolean isOwnerAdmin(Domain domain, DomResOwner domResOwner, DomOwnerUser domOwnerUser);
+    boolean isOwnerAdmin(int domId, int ownerId, int userId);
     boolean userExist(int domId, int ownerId, int userId);
 
     //liu

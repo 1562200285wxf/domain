@@ -11,6 +11,7 @@ import cn.itsmith.sysutils.resacl.utils.ResultUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 @Service(value="DomOwnerUserService")
 public class DomOwnerUserServiceImpl implements DomOwnerUserService {
@@ -19,6 +20,42 @@ public class DomOwnerUserServiceImpl implements DomOwnerUserService {
     DomOwnerUserMapper domOwnerUserMapper;
     @Autowired
     DomResOwnerMapper ownerMapper;
+    @Autowired
+    DomResOwnerMapper domResOwnerMapper;
+
+    @Override
+    public boolean isOwnerAdmin(int domId, int ownerId, int userId) {
+        DomResOwner domResOwner = domResOwnerMapper.selectById(domId, ownerId);
+        DomOwnerUser domOwnerUser = domOwnerUserMapper.selectById(domId, ownerId, userId);
+        //当前属主是最高属主，此用户是否是当前属主的管理员
+        if(domResOwner.getPId() == 0){
+            if(domOwnerUser != null){
+                if(domOwnerUser.getIsAdmin()==1 && domOwnerUser.getStatus()==1){
+                    return true;
+                }
+            }
+        } else{
+            //此用户是否是当前属主的管理员
+            if(domOwnerUser != null){
+                if(domOwnerUser.getIsAdmin()==1 && domOwnerUser.getStatus()==1){
+                    return true;
+                }
+            }
+            //往上递归，看该用户是否是父属主的管理员
+            while(domResOwner.getPId()!=0){
+                domResOwner = domResOwnerMapper.selectById(domId, domResOwner.getPId());
+                domOwnerUser = domOwnerUserMapper.selectById(domId, domResOwner.getOwnerId(), userId);
+                if(domOwnerUser != null){
+                    if(domOwnerUser.getIsAdmin()==1 && domOwnerUser.getStatus()==1){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+
+
+    }
 
     @Override
     public boolean userExist(int domId, int ownerId, int userId) {
