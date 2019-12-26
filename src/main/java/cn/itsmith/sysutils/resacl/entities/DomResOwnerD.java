@@ -9,4 +9,5 @@ import lombok.Data;
 public class DomResOwnerD {
     Integer domId;
     Integer ownerId;
+    Integer pId;
 }
