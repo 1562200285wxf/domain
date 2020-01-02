@@ -309,6 +309,7 @@ DomResOperationMapper domResOperationMapper;
             return false;
     }
 
+    //权限继承
     public boolean isExtend(DomUserOperation domUserOperation){
         return false;
     }

@@ -61,7 +61,7 @@
         AND types = #{types}
         and status=1
     </select>
-    <!--selectOps单纯用户拥有的ops-->
+    <!--selectOps单纯用户拥有的ops这里-->
     <select id="selectOps" resultType="cn.itsmith.sysutils.resacl.entities.DomUserOperation">
         SELECT * from t_dom_user_operation
         where domid = #{domId}
