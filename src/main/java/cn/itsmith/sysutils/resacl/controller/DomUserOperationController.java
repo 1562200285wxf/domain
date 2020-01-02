@@ -232,4 +232,13 @@ public class DomUserOperationController {
         return domUserOperationService.delOp(domUserOperation);
     }
 
+    @ApiOperation(value = "资源授权的检查", notes = "针对资源授权的检查操作  \n" +
+            "检查存在：200  \n" +
+            "检查失败: 2004 \n" +
+            "...")
+    @RequestMapping(value="/checkUserOperation",method = RequestMethod.POST)
+    public ResultUtils checkUserOperation(@RequestBody DomUserOperation domUserOperationA){
+        return domUserOperationService.checktOps(domUserOperationA);
+    }
+
 }
