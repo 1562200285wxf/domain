@@ -86,15 +86,7 @@
         AND types = #{types}
         and status=1
     </select>
-    <select id="selectOps" resultType="cn.itsmith.sysutils.resacl.entities.DomUserOperation">
-        SELECT * from t_dom_user_operation
-        where domid = #{domId}
-        and restypeid = #{resTypeId}
-        and resid = #{resId}
-        and ownerid = #{ownerId}
-        and userownerid = #{userOwnerId}
-        AND Types = 0
-    </select>
+
     <!--防止重复插入，所有参数7个-->
     <select id="selectByWhole" resultType="cn.itsmith.sysutils.resacl.entities.DomUserOperation">
         select * from t_dom_user_operation
