@@ -218,7 +218,7 @@ DomResOperationMapper domResOperationMapper;
        if(domUserOperationTest!=null){
             resultMessage =  "检查资源授权成功，域"+domUserOperation.getDomId()+"下的属主"+
                    domUserOperation.getOwnerId()+"下成员"+domUserOperation.getUserOwnerId()+
-                   "有资源类型为"+domUserOperation.getResTypeId()+"，实例为"+domUserOperation.getResId()+
+                   "有资源类型为"+domUserOperation.getResTypeId()+"，权限为"+domUserOperation.getOpId()+
                    "资源授权记录";
            resultUtils.setCode(ResponseInfo.SUCCESS_IS.getErrorCode());
            resultUtils.setMessage(resultMessage);
@@ -230,7 +230,7 @@ DomResOperationMapper domResOperationMapper;
             if(domUserOperationServiceImpl.isCommon(domUserOperation)) {
                 resultMessage = "检查资源授权成功，域" + domUserOperation.getDomId() + "下的属主" +
                         domUserOperation.getOwnerId() + "下成员" + domUserOperation.getUserOwnerId() +
-                        "有资源类型为" + domUserOperation.getResTypeId() + "，实例为" + domUserOperation.getResId() +
+                        "有资源类型为" + domUserOperation.getResTypeId() + "，权限为" + domUserOperation.getOpId() +
                         "资源授权记录";
                 resultUtils.setCode(ResponseInfo.SUCCESS_IS.getErrorCode());
                 resultUtils.setMessage(resultMessage);
@@ -241,14 +241,14 @@ DomResOperationMapper domResOperationMapper;
 
         resultMessage = "检查资源授权失败，域" + domUserOperation.getDomId() + "下的属主" +
                 domUserOperation.getOwnerId() + "下成员" + domUserOperation.getUserOwnerId() +
-                "不具备资源类型为" + domUserOperation.getResTypeId() + "，实例为" + domUserOperation.getResId() +
+                "不具备资源类型为" + domUserOperation.getResTypeId() + "，权限为" + domUserOperation.getResId() +
                 "资源授权";
         resultUtils.setCode(ResponseInfo.OPERATION_NOT.getErrorCode());
         resultUtils.setMessage(resultMessage);
         return resultUtils;
     }
 
-    //如果资源属组拥有资源种类，并且该种类的某种权限是可以通用
+    //首先判断是否通用。再判断是否在上级属组
     boolean isCommon(DomUserOperation domUserOperation){
         //先检查该资源权限是否在域内是通用的
         Integer domId = domUserOperation.getDomId();
@@ -257,13 +257,19 @@ DomResOperationMapper domResOperationMapper;
         Integer type = domUserOperation.getTypes();
         Integer uid = domUserOperation.getUserOwnerId();
 
-        DomResOperation domResOperationTest = null;
-        domResOperationTest.setOpId(domUserOperation.getOpId());
-        domResOperationTest.setResTypeId(domUserOperation.getResTypeId());
-        domResOperationTest.setDomId(domUserOperation.getDomId());
-        DomResOperation domResOperationCommon = domResOperationMapper.select(domResOperationTest);
+        DomResOperation domResOperationTest1 = new DomResOperation();
+        domResOperationTest1.setOpId(domUserOperation.getOpId());
+        domResOperationTest1.setResTypeId(domUserOperation.getResTypeId());
+        domResOperationTest1.setDomId(domUserOperation.getDomId());
+        DomResOperation domResOperationCommon = domResOperationMapper.select(domResOperationTest1);
         if(domResOperationCommon == null){
             return false;
+        }
+        if(domResOperationCommon != null)
+        {
+            if(domResOperationCommon.getIsCommon() !=1){
+                return false;
+            }
         }
 
         //检查属主是否拥有所在域的该资源种类
@@ -280,6 +286,7 @@ DomResOperationMapper domResOperationMapper;
                 }
             } while (ownerId == 0);
         }
+
         //如果参数是属主id，
         if(type == 1){
             do {
@@ -289,11 +296,20 @@ DomResOperationMapper domResOperationMapper;
                     }
                 }
                 if (domResOperationCommon == null) {
-                    ownerId = domResOwnerMapper.selectById(domId, ownerId).getPId();
+                    uid = domResOwnerMapper.selectById(domId, uid).getPId();
                 }
-            } while (ownerId == 0);
+            } while (uid == 0);
+        }
+        //判断ownerId=0等于0的情况
+        if(type == 0 && ownerId == 0){
+            if (domOwnerResMapper.selectById(domId, ownerId, resTypeId) != null) {
+                return true;
+            }
         }
             return false;
     }
 
+    public boolean isExtend(DomUserOperation domUserOperation){
+        return false;
+    }
     }

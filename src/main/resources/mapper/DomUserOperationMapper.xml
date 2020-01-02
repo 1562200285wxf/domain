@@ -29,7 +29,7 @@
         from t_dom_user_operation
         where domid=#{domId, jdbcType=INTEGER} and restypeid=#{resTypeId, jdbcType=INTEGER} and opid=#{opId, jdbcType=INTEGER}
     </select>
-<!--    根据资源实例id删除资源授权-->
+    <!--    根据资源实例id删除资源授权-->
     <delete id="deleteByResId" >
         delete
         from t_dom_user_operation
@@ -43,7 +43,7 @@
         </set>
         where domid=#{domId} and ownerid=#{ownerId} and resid=#{resId} and restypeid=#{resTypeId}
     </update>
-<!--//liu-->
+    <!--//liu-->
     <!--单纯查资源授权,2个参数-->
     <select id="selectByResId" resultType="cn.itsmith.sysutils.resacl.entities.DomUserOperation">
         SELECT * from t_dom_user_operation
@@ -105,14 +105,14 @@
     </insert>
     <!--7个全部参数-->
     <!--<delete id="delete">-->
-        <!--DELETE FROM t_dom_user_operation-->
-        <!--where domid = #{domId}-->
-        <!--and ownerid = #{ownerId}-->
-        <!--and restypeid = #{resTypeId}-->
-        <!--and resid = #{resId}-->
-        <!--and userownerid = #{userOwnerId}-->
-        <!--and Types = #{types}-->
-        <!--AND opid = #{opId}-->
+    <!--DELETE FROM t_dom_user_operation-->
+    <!--where domid = #{domId}-->
+    <!--and ownerid = #{ownerId}-->
+    <!--and restypeid = #{resTypeId}-->
+    <!--and resid = #{resId}-->
+    <!--and userownerid = #{userOwnerId}-->
+    <!--and Types = #{types}-->
+    <!--AND opid = #{opId}-->
     <!--</delete>-->
     <update id="delete">
         update t_dom_user_operation SET status=0
