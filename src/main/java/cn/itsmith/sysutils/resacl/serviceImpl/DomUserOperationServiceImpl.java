@@ -209,8 +209,7 @@ DomResOperationMapper domResOperationMapper;
     @Override
     public ResultUtils checktOps(DomUserOperation domUserOperation){
         ResultUtils resultUtils = new ResultUtils();
-        String resultMessage = null;
-       Integer domId = domUserOperation.getDomId();
+        String resultMessage;
         DomUserOperation domUserOperationTest;
 
        //直接进行查询，是否有该权限
@@ -227,16 +226,18 @@ DomResOperationMapper domResOperationMapper;
        // 检查通用或者继承权限
         if(domUserOperationTest == null){
             //通用性检查
-            if(domUserOperationServiceImpl.isCommon(domUserOperation)) {
+            if(domUserOperationServiceImpl.isExtend(domUserOperation) ) {
                 resultMessage = "检查资源授权成功，域" + domUserOperation.getDomId() + "下的属主" +
                         domUserOperation.getOwnerId() + "下成员" + domUserOperation.getUserOwnerId() +
                         "有资源类型为" + domUserOperation.getResTypeId() + "，权限为" + domUserOperation.getOpId() +
                         "资源授权记录";
                 resultUtils.setCode(ResponseInfo.SUCCESS_IS.getErrorCode());
                 resultUtils.setMessage(resultMessage);
+                return resultUtils;
             }
-            return resultUtils;
+
         }
+
 
 
         resultMessage = "检查资源授权失败，域" + domUserOperation.getDomId() + "下的属主" +
@@ -249,7 +250,7 @@ DomResOperationMapper domResOperationMapper;
     }
 
     //首先判断是否通用。再判断是否在上级属组
-    boolean isCommon(DomUserOperation domUserOperation){
+    public boolean isCommon(DomUserOperation domUserOperation){
         //先检查该资源权限是否在域内是通用的
         Integer domId = domUserOperation.getDomId();
         Integer resTypeId = domUserOperation.getResTypeId();
@@ -309,8 +310,50 @@ DomResOperationMapper domResOperationMapper;
             return false;
     }
 
-    //权限继承
+    //权限继承（在本表中已经不存在，才会检查是否是继承得到的权限）
+    //1在资源权限表检查要检查的权限继承种类
+    //2权限种类的id是否和父的一样
+    //是否拥有父的权限
     public boolean isExtend(DomUserOperation domUserOperation){
+        Integer domId = domUserOperation.getDomId();
+        Integer resTypeId = domUserOperation.getResTypeId();
+        Integer ownerId = domUserOperation.getOwnerId();
+        Integer type = domUserOperation.getTypes();
+        Integer uid = domUserOperation.getUserOwnerId();
+        Integer  opid = domUserOperation.getOpId();
+
+        DomResOperation domResOperationSelect = new DomResOperation();
+        domResOperationSelect.setDomId(domId);
+        domResOperationSelect.setResTypeId(resTypeId);
+        domResOperationSelect.setOpId(opid);
+
+        DomResOperation domResOperationTest = domResOperationMapper.select(domResOperationSelect);
+        if(domResOperationTest.getIsExtend() !=1){
+            return false;
+        }
+        if(domResOperationTest.getIsExtend() ==1){
+            //表明权限是继承得来的，检查子父权限id是否相同,事实上在设置为继承的时候id一定相同。
+            DomResType  domResTypeChild = domResTypeMapper.getDomResTypeByResTypeId(domId,resTypeId);
+            DomResType  domResTypeParent = domResTypeMapper.getDomResTypeByResTypeId(domId,domResTypeChild.getPId());
+            //接下来检查是否拥有父的这个权限
+            DomUserOperation domUserOperationParent= new DomUserOperation();
+            domUserOperationParent.setDomId(domId);
+            domUserOperationParent.setOwnerId(domResTypeParent.getResTypeId());
+            domUserOperationParent.setResTypeId(opid);
+            domUserOperationParent.setUserOwnerId(uid);
+            domUserOperationParent.setTypes(domUserOperation.getTypes());
+            DomUserOperation domUserOperationParentTest;
+            domUserOperationParentTest = domUserOperationMapper.checkOpernationByDomUserOperation(domUserOperationParent);
+            //检查本表是否存在
+            if(domUserOperationParentTest != null){
+                return  true;
+            }
+            //检查是否拥有此资源种类
+            if(isCommon(domUserOperationParent)){
+                return  true;
+            }
+
+        }
         return false;
     }
     }
